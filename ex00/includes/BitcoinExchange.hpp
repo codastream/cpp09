@@ -9,8 +9,13 @@
 #include <fstream>
 #include <iomanip>
 #include <limits>
+#include <cstdlib>
+#include <locale>
+#include <cstring>
 
-typedef std::map<std::tm, double> timeVal_t;
+#define ISO "%Y-%m-%d"
+
+typedef std::map<std::time_t, double> timeVal_t;
 
 class BitcoinExchange {
 
@@ -20,30 +25,30 @@ class BitcoinExchange {
 		BitcoinExchange(const BitcoinExchange& other);
 		BitcoinExchange& operator=(const BitcoinExchange& other);
 		
-		void	printValues(const std::string& inputfile);
+		void	printValues(const char* inputfile);
+
+		class ParseException : public std::exception
+		{
+			private:
+				std::string	_msg;
+		
+			public:
+				ParseException(const std::string& msg);
+				virtual ~ParseException() throw();
+				virtual const char*	what() const throw();
+		};
 
 	private:
 		timeVal_t	_input;
 		timeVal_t	_rates;
 
-		const char*	_expectedDateFormat = "%Y-%m-%d";
-
-		timeVal_t	_parseRates(const std::string& datafile);
-		timeVal_t	_parseInput(const std::string& inputfile);
-		bool		_parseDate(std::string& s, tm* time);
-		bool		_parseLine(std::string& s, char sep, int linenb, timeVal_t& map);
-		bool		_parseFile(const std::string& filename, bool isInput);
-		double		_getRateForClosestLowerDate(const std::tm& time);
-		class ParseException : public std::exception
-		{
-			private:
-				const char* _msg;
-		
-			public:
-				ParseException(const std::string& msg);
-				virtual ~ParseException() throw();
-				virtual const char*		what(void) const throw();
-		};
+		// static const char*	_expectedDateFormat;
+		// void		_parseDate(std::string& s, std::tm *time, time_t* key);
+		bool		_parseLine(std::string& s, char sep, timeVal_t& map, bool isInput);
+		bool		_parseRates(const char* filename);
+		void		_printFromInput(const char* filename);
+		void		_printValue(std::tm time, double qty);
+		double		_getRateForClosestLowerDate(const std::time_t& time);
 };
 
 #endif
