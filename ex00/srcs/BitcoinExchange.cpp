@@ -119,14 +119,15 @@ static bool _isValidDate(std::tm time)
 	return true;
 }
 
-static void _parseDate(std::string& s, std::tm* time, time_t* key)
+static bool _parseDate(std::string& s, std::tm* time, time_t* key)
 {
 	const char*	dateStr = s.c_str();
 	if (!strptime(dateStr, ISO, time))
-		throw std::runtime_error("conversion error");
+		return false;
 	*key = std::mktime(time);
 	if (*key == -1)
 		throw std::runtime_error("conversion error");
+	return true;
 }
 
 bool	BitcoinExchange::_parseLine(std::string& s, char sep, timeVal_t& dic, bool isInput)
@@ -137,7 +138,8 @@ bool	BitcoinExchange::_parseLine(std::string& s, char sep, timeVal_t& dic, bool 
 	std::string	date = s.substr(0, sepIndex);
 	std::tm time = {};
 	std::time_t key;
-	_parseDate(date, &time, &key);
+	if (!_parseDate(date, &time, &key))
+		return false;
 	if (!_isValidDate(time))
 		return false;
 	std::string	value = s.substr(sepIndex + 1, s.npos);
@@ -209,7 +211,7 @@ void	BitcoinExchange::_printFromInput(const char* filename)
 	std::ifstream fs(filename);
 	if (!fs.is_open())
 		throw std::runtime_error("error opening file");
-	if (!checkHeader(false, fs))
+	if (!checkHeader(true, fs))
 		_puterr("bad header", "");
 	size_t linenb = 2;
 	for (std::string line; std::getline(fs, line);)
