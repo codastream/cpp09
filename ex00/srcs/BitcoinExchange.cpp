@@ -74,7 +74,7 @@ static bool	_tryConvertDouble(const std::string& s, double* converted, bool isIn
 	double value = std::strtod(s.c_str(), &end);
 	if (isInput && value < 0)
 		_puterr("not a positive number", "");
-	else if (isInput && value > std::numeric_limits<int>::max())
+	else if (isInput && value > 1000)
 		_puterr("too large a number", "");
 	else
 		is_err = false;
@@ -234,11 +234,10 @@ double	BitcoinExchange::_getRateForClosestLowerDate(const std::time_t& time)
 {
 	timeVal_t::iterator	it;
 
-	it = _rates.lower_bound(time);
-	if (it == _rates.end())
-		return 0;
-	else
-		return it->second;
+	it = (_rates.lower_bound(time));
+	if (it->first != time)
+		it--;
+	return it->second;
 }
 
 void	BitcoinExchange::printValues(const char* inputfile)
