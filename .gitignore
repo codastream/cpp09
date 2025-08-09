@@ -1,5 +1,5 @@
 *.o
 ex00/btc
-ex01/rpn
+ex01/RPN
 data.csv
 input.txt

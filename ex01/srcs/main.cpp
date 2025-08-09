@@ -6,14 +6,14 @@
 /*   By: fpetit <fpetit@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 13:21:53 by fpetit            #+#    #+#             */
-/*   Updated: 2025/08/09 14:56:52 by fpetit           ###   ########.fr       */
+/*   Updated: 2025/08/09 16:28:20 by fpetit           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RPN.hpp"
 #include "util.hpp"
 
-bool	checkArgs(int ac, char **av)
+bool	checkArgs(int ac)
 {
 	if (ac != 2)
 	{
@@ -25,8 +25,8 @@ bool	checkArgs(int ac, char **av)
 
 int	main(int ac, char **av)
 {
-	if (!checkArgs(ac, av))
+	if (!checkArgs(ac))
 		return 1;
 	RPN calc;
-	calc.addArgs(av[1]);
+	return (calc.compute(av[1]));
 }

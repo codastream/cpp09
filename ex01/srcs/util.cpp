@@ -10,8 +10,7 @@ void	printcol(const std::string& col, const std::string& msg)
 	std::cout << col << msg << NC << std::endl;
 }
 
-void	puterr(const std::string& s, const std::string& faulty)
+void	puterr()
 {
-	const std::string& msg = faulty.empty() ? s : s + " => " + faulty;
-	std::cerr << RED << "Error: " << msg << NC << std::endl;
+	std::cerr << "Error" << std::endl;
 }
