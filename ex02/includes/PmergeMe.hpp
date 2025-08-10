@@ -5,9 +5,10 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include <list>
 #include <cstdlib>
 #include <limits>
+#include <cstdlib>
+#include <algorithm>
 
 class PmergeMe {
 	public:
@@ -16,16 +17,14 @@ class PmergeMe {
 		PmergeMe(const PmergeMe& other);
 		PmergeMe& operator=(const PmergeMe& other);
 
-		void	sortList(std::list<int>& list);
-		void	sortVec(std::list<int>& vec);
+		void				doSort();
+		// std::vector<int>&	sortVec(std::vector<int>& v);
+		void				sortVec(std::vector<int>& v, std::vector<int>* sorted);
+
+		void				initVec(int ac, char **av);
 
 	private:
 		std::vector<int>	_vec;
-		std::list<int>		_list;
-		bool				_checkArgs(int ac, char **av);
-		void				_initList(int ac, char **av);
-		void				_compareList(std::list<int>& list);
-		void				_insert(std::list<int>& main, std::list<int>& from);
 };
 
 #endif

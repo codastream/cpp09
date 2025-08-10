@@ -59,7 +59,7 @@ BUILD_DIR		:=	.build
 
 SRCS_FILES:=	main.cpp\
 				util.cpp\
-				RPN.cpp\
+				PmergeMe.cpp\
 
 SRCS:=			$(addprefix $(SRC_DIR)/, $(SRCS_FILES))
 
