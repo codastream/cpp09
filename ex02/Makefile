@@ -3,10 +3,10 @@ NAME		:=	PmergeMe
 #==============================COMPIL===========================#
 
 CC			:=	c++
-CFLAGS		:=	-Wall -Wextra -Werror -std=c++98
+CXXFLAGS		:=	-Wall -Wextra -Werror -std=c++98
 
 ifeq ($(DEBUG), 1)
-	CFLAGS += -g
+	CXXFLAGS += -g
 endif
 
 MAKEFLAGS	:=	--no-print-directory
@@ -84,7 +84,7 @@ $(DIRS):
 
 $(NAME): $(OBJS)
 	@echo "\n$(GREEN)Create binaries$(NOC)"
-	@$(CC) $(CFLAGS) $(OBJS) $(INC) -o $@
+	@$(CC) $(OBJS) $(INC) -o $@
 
 # $$@D gets directory from current target - pipe prevents from relink
 # tput cols to get columns nb of terminal
@@ -97,7 +97,7 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp | $(DIRS)
 	@echo -n "\r"; for i in $$(seq 1 25); do if [ $$(expr $$i "*" 4) -le $(PERCENT) ]; then echo -n "█"; else echo -n " "; fi; done; echo -n "";
 	@printf " $(NB_COMP)/$(TO_COMP) - Compiling $<"
 	@echo -n "$(NOC)"
-	@$(CC) $(CFLAGS) $(INC) $< -c -o $@
+	@$(CC) $(CXXFLAGS) $(INC) $< -c -o $@
 	$(eval NB_COMP=$(shell expr $(NB_COMP) + 1))
 
 clean:

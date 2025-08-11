@@ -9,6 +9,7 @@
 #include <limits>
 #include <cstdlib>
 #include <algorithm>
+#include <cmath>
 
 class PmergeMe {
 	public:
@@ -17,14 +18,15 @@ class PmergeMe {
 		PmergeMe(const PmergeMe& other);
 		PmergeMe& operator=(const PmergeMe& other);
 
-		void				doSort();
-		// std::vector<int>&	sortVec(std::vector<int>& v);
-		void				sortVec(std::vector<int>& v, std::vector<int>* sorted);
-
-		void				initVec(int ac, char **av);
-
+		void								doSort();
+		void								initVec(int ac, char **av);
+		
 	private:
-		std::vector<int>	_vec;
+		std::vector<int>					_vec;
+		std::vector<std::pair<int, int> >	_pairs;
+
+		void								_presortVec(std::vector<int>& v);
+		void								_sortVec(std::vector<int>& v, std::vector<int>* sorted, int depth);
 };
 
 #endif
