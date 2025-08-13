@@ -10,6 +10,9 @@
 #include <cstdlib>
 #include <algorithm>
 #include <cmath>
+#include <iterator>
+#include <utility>
+#include <iomanip>
 
 class PmergeMe {
 	public:
@@ -23,10 +26,12 @@ class PmergeMe {
 		
 	private:
 		std::vector<int>					_vec;
-		std::vector<std::pair<int, int> >	_pairs;
+		int									_compMerge;
+		int									_compInsert;
 
 		void								_presortVec(std::vector<int>& v);
 		void								_sortVec(std::vector<int>& v, std::vector<int>* sorted, int depth);
+		int									_binarySearchIndex(std::vector<int>&v, int val, int tk);
 };
 
 #endif

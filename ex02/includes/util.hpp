@@ -4,14 +4,14 @@
 #include <string>
 #include <iostream>
 
-# define DEBUG		false
+# define DEBUG		true
 
 # define NC			"\033[0m"
 # define RED		"\033[31m"
 # define BLUE		"\033[34m"
 # define CYAN		"\033[36m"
 # define BLACK		"\033[30m"
-# define ORANGE		"\033[33m"
+# define ORANGE		"\033[38;5;208m"
 # define WHITE		"\033[37m"
 # define GREEN		"\033[32m"
 # define YELLOW		"\033[33m"
@@ -35,7 +35,7 @@
 # define CDOUBLE	BLUE
 
 void	printnl(const std::string &s);
-void	printcol(const std::string& col, const std::string& msg);
+void	printcol(int depth, const std::string& col, const std::string& msg);
 void	puterr();
 
 #endif
