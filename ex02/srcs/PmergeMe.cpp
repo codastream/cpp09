@@ -5,9 +5,12 @@
 *				🥚 CONSTRUCTORS & DESTRUCTOR				*
 ************************************************************/
 
-PmergeMe::PmergeMe(void) : _vec(), _compMerge(0), _compInsert(0) {}
+static std::vector<int>	generateJSequence(int size);
+static void _printVec(std::vector<int>& v, const std::string& msg, int depth, int outlineIdxStart, int outlineIdxend, const char* outlineColor);
 
-PmergeMe::PmergeMe(const PmergeMe& inst) : _vec(inst._vec), _compMerge(0), _compInsert(0) {}
+PmergeMe::PmergeMe(void) : _vec(), _compMerge(0), _compInsert(0), _timeToMerge(0), _timeToInsert(0), _jacob(generateJSequence(21)) {}
+
+PmergeMe::PmergeMe(const PmergeMe& inst) : _vec(inst._vec), _compMerge(0), _compInsert(0), _timeToMerge(0), _timeToInsert(0), _jacob(inst._jacob) {}
 
 PmergeMe::~PmergeMe(void) {}
 
@@ -28,7 +31,52 @@ PmergeMe& PmergeMe::operator=(const PmergeMe& inst)
 *		        🛠️ FUNCTIONS								*
 *************************************************************/
 
-std::vector<int>	generateJSequence(int size)
+static void _printVec(std::vector<int>& v, const std::string& msg, int depth, int outlineIdxStart, int outlineIdxend, const char* outlineColor)
+{
+	std::string color = YELLOW;
+	if (!DEBUG)
+		return ;
+	for (int i = 0; i < depth; i++)
+		std::cout << "  ";
+	std::cout << BLUE << std::left << std::setw(16) << msg << NC;
+	for (int i = 0; i < depth; i++)
+		std::cout << "\t";
+	int i = 0;
+	for (std::vector<int>::const_iterator cit = v.begin(); cit != v.end(); ++cit)
+	{
+		if (outlineIdxStart != -1 && i >= outlineIdxStart && i <= outlineIdxend)
+			color = outlineColor;
+		else
+			color = YELLOW;
+		std::cout << color << std::left << std::setw(8) << *cit << NC;
+		i++;
+	}
+	std::cout << std::endl;
+}
+
+#if PRINTSTEP
+static void _printPairs(std::vector<int>& v, std::vector<std::pair<int, int> >& pairs, int depth)
+{
+	size_t psize = pairs.size();
+	for (int i = 0; i < depth * 2; i++)
+		std::cout << " ";
+	std::cout << BLUE << std::left << std::setw(16) << "sorted pairs" << NC;
+	for (int i = 0; i < depth; i++)
+		std::cout << "\t";
+	for (size_t i = 0 ; i < psize; ++i)
+	{
+		if (pairs[i].first != v[i * 2])
+		{
+			std::cout << std::left << BPURPLE << std::left << std::setw(8) << pairs[i].first << PURPLE << std::setw(8) << pairs[i].second << YELLOW << NC;
+		}
+		else
+			std::cout  << std::left << YELLOW << std::left << std::setw(8) << pairs[i].first << std::setw(8) << pairs[i].second << YELLOW << NC;
+	}
+	std::cout << std::endl;
+}
+#endif
+
+static std::vector<int>	generateJSequence(int size)
 {
 	std::vector<int> v;
 	v.push_back(0);
@@ -52,17 +100,27 @@ int	PmergeMe::_binarySearchIndex(std::vector<int>&v, int val, int tk)
 	if (v.size() == 0)
 		return 0;
 	else if (end == 1)
-		return val > v[0] ? 1 : 0;
+	{
+		if (val > v[0])
+		{
+			++_compInsert;
+			return 1;
+		}
+		else
+			return 0;
+	}
 	while (start <= end)
 	{
-		_compInsert++;
+		++_compInsert;
 		int mid = start + (end - start) / 2;
 		if (v[mid] < val)
 		{
+			++_compInsert;
 			start = mid + 1;
 		}
 		else if (v[mid] > val)
 		{
+			++_compInsert;
 			end = mid - 1;
 		}
 		else
@@ -75,159 +133,193 @@ int	PmergeMe::_binarySearchIndex(std::vector<int>&v, int val, int tk)
 
 void	PmergeMe::doSort()
 {
+	int	n;
+
+	n = _vec.size();
 	std::vector<int> sorted;
+	_printVec(_vec, "input", 0, -1, -1, YELLOW);
+
 	_sortVec(_vec, &sorted, 0);
+
+	_printVec(sorted, "sorted", 0, -1, -1, YELLOW);
+
+	printTitle(BLUEBACK, "RESULTS");
+	printTitle(BLUE, "Input size (n)");
+	std::cout << n << std::endl;
+	printTitle(BLUE, "Expected complexity");
+	std::cout << BLUE << "theoretical best = O (n log n −1.4427n)\t" << NC << n * std::log(n) - 1.4427 * n << std::endl;
+	printTitle(BLUE, "Nb of comparisons");
+	std::cout << BLUE << "merge\t" << NC << _compMerge << std::endl;
+	std::cout << BLUE << "insert\t" << NC << _compInsert << std::endl;
+	std::cout << BBLUE << "total\t" << NC << _compMerge + _compInsert << std::endl;
+	printTitle(BLUE, "Compute time");
+	std::cout << BLUE << "merge\t" << NC << std::fixed << std::setprecision(5) << _timeToMerge << " sec" << std::endl;
+	std::cout << BLUE << "insert\t" << NC << std::fixed << std::setprecision(5) << _timeToInsert << " sec" << std::endl;
+	std::cout << BBLUE << "total\t" << NC << std::fixed << std::setprecision(5) << _timeToMerge + _timeToInsert << " sec" << std::endl;
 }
 
-static void _printVec(std::vector<int>& v, const std::string& msg, int depth, int outlineIdxStart, int outlineIdxend, const char* outlineColor)
+bool	PmergeMe::_checkEndOfRecursion(std::vector<int>& v, std::vector<int>* sorted, int depth)
 {
-	std::string color = YELLOW;
-	if (!DEBUG)
-		return ;
-	for (int i = 0; i < depth; i++)
-		std::cout << "  ";
-	std::cout << BLUE << std::setw(16) << msg << NC;
-	for (int i = 0; i < depth; i++)
-		std::cout << "\t";
-	int i = 0;
-	for (std::vector<int>::const_iterator cit = v.begin(); cit != v.end(); ++cit)
-	{
-		if (outlineIdxStart != -1 && i >= outlineIdxStart && i <= outlineIdxend)
-			color = outlineColor;
-		else
-			color = YELLOW;
-		std::cout << color << std::left << std::setw(8) << *cit << NC;
-		i++;
-	}
-	std::cout << std::endl;
-}
-
-static void _printPairs(std::vector<int>& v, std::vector<std::pair<int, int> >& pairs, int depth)
-{
-	size_t psize = pairs.size();
-	for (int i = 0; i < depth * 2; i++)
-		std::cout << " ";
-	for (size_t i = 0 ; i < psize; ++i)
-	{
-		if (pairs[i].first != v[i * 2])
-		{
-			std::cout << std::left << YELLOW << ORANGE << std::left << std::setw(6) << pairs[i].first << std::setw(4) << pairs[i].second << YELLOW << "/ " << NC;
-		}
-		else
-			std::cout  << std::left << YELLOW << std::left << std::setw(6) << pairs[i].first << std::setw(4) << pairs[i].second << YELLOW << "/ " << NC;
-	}
-	std::cout << std::endl;
-}
-
-static size_t computeJacobstahl(size_t k)
-{
-	size_t power = size_t(1) << (k + 1);
-	size_t numerator;
-	if ((k + 1) % 2 == 0)
-		numerator = power - 1;
-	else
-		numerator = power + 1;
-	return (numerator / 3);
-}
-
-
-void	PmergeMe::_sortVec(std::vector<int>& v, std::vector<int>* sorted, int depth)
-{
-	if (DEBUG)
-		std::cout << YELLOW << "===== " << depth << " =====" << NC << std::endl;
-	// stop conditions
+	(void) depth;
+	clock_t	start = clock();
 	if (v.size() <= 1)
 	{
 		*sorted = v;
-		_printVec(v, "sorted", depth, -1, -1, YELLOW);
-		return ;
+		return true;
 	}
 	if (v.size() == 2)
 	{
 		if (v[0] > v[1])
 		{
-			std::swap(v[0], v[1]); // sorting in expected final asc order this time
-			_printVec(v, "sorted", depth, 0, 1, ORANGE);
+			std::swap(v[0], v[1]);
 		}
 		_compMerge++;
 		*sorted = v;
-		return ;
+		return true;
 	}
+	clock_t	end = clock();
+	_timeToMerge += double(end - start) / double(CLOCKS_PER_SEC);
+	return false;
+}
 
-	printcol(depth, BLUEBACK, "step 1 - making and sorting pairs");
-	std::vector<std::pair<int, int> >	pairs;
+void	PmergeMe::_sortPairs(std::vector<int>&v, std::vector<std::pair<int, int> >&	pairs, int depth)
+{
+	#if PRINTSTEP
+	printcoldep(depth, IWHITE, "step 1 - making and sorting pairs");
 	_printVec(v, "before presort", depth, -1, -1, YELLOW);
-	std::vector<int> oldv = v;
+	#else
+	(void) depth;
+	#endif
+	clock_t start = clock();
+	std::vector<int> 					oldv = v; // only for printpairs
 	for (size_t i = 0; i + 1 < v.size(); i += 2)
 	{
 		if (v[i] < v[i + 1])
-		{
 			std::swap(v[i], v[i + 1]);
-		}
 		_compMerge++;
 		pairs.push_back(std::make_pair(v[i], v[i + 1]));
 	}
+	clock_t	end = clock();
+	_timeToMerge += double(end - start) / double(CLOCKS_PER_SEC);
+	#if PRINTSTEP
 	_printPairs(oldv, pairs, depth);
+	#endif
+}
 
-	printcol(depth, BLUEBACK, "step 2 - recursively sorting the biggest elements");
+void	PmergeMe::_sortBiggest(size_t vSize, std::vector<int>& main, std::vector<std::pair<int, int> >&	pairs, int depth)
+{
+	#if PRINTSTEP
+	printcoldep(depth, IWHITE, "step 2 - recursively sorting the biggest elements");
+	#endif
+	clock_t	start = clock();
 	std::vector<int> vBig;
-	vBig.reserve((v.size() + 1) / 2);
+	vBig.reserve((vSize + 1) / 2);
 	for (size_t i = 0; i < pairs.size(); ++i)
 	{
 		vBig.push_back(pairs[i].first);
 	};
-	std::vector<int> vBigSorted;
-	_sortVec(vBig, &vBigSorted, depth + 1);
-	
-	printcol(depth, BLUEBACK, "step 3 - building a final sorted main chain and a pending chain");
-	std::vector<int> main = vBigSorted;
-	int minfromPair0 = v[1];
-	main.insert(main.begin(), minfromPair0);
-	_printVec(main, "main", depth, 0, 0, GREEN);
+	clock_t	end = clock();
+	_timeToMerge += double(end - start) / double(CLOCKS_PER_SEC);
+	#if PRINTSTEP
+	_printVec(vBig, "biggest", depth, -1, -1, YELLOW);
+	#endif
+	_sortVec(vBig, &main, depth + 1);
+}
 
-	std::vector<int> pending;
+void	PmergeMe::_createPending(std::vector<int>& v, std::vector<int>& pending, std::vector<std::pair<int, int> >&	pairs, int depth)
+{
+	#if PRINTSTEP
+	printcoldep(depth, IWHITE, "step 3 - pending chain");
+	#else
+	(void) depth;
+	#endif
+	clock_t	start = clock();
 	pending.reserve(v.size() / 2);
-	for (size_t i = 1; i < pairs.size(); ++i)
+	for (size_t i = 0; i < pairs.size(); ++i)
 	{
 		pending.push_back(pairs[i].second);
 	};
 	if (v.size() % 2 == 1)
 		pending.push_back(v.back());
+	clock_t	end = clock();
+	_timeToMerge += double(end - start) / double(CLOCKS_PER_SEC);
+	#if PRINTSTEP
 	_printVec(pending, "pending", depth, -1, -1, YELLOW);
+	#endif
+}
 
-	printcol(depth, BLUEBACK, "step 4a - Inserting using Jacobstahl sequence to ensure distribution");
-	size_t pendingNb = pending.size();
-	int k = 1;
-	int insertIndex = -1;
-	size_t tk = computeJacobstahl(k);
-	std::cout << "tk " << tk << std::endl;
-	int toInsert;
+void	PmergeMe::_binaryInsert(std::vector<int>& main, std::vector<int>& pending, int depth)
+{
+	size_t	pendingNb;
+	int		k;
+	size_t	tk;
+	int		toInsert;
+	int		insertIndex;
+	clock_t	start;
+	clock_t	end;
+
+	#if PRINTSTEP
+	printcoldep(depth, IWHITE, "step 4a - Inserting using Jacobstahl sequence to ensure distribution");
+	#else
+	(void) depth;
+	#endif
+	start = clock();
+	pendingNb = pending.size();
+	k = 1;
+	tk = _jacob[k];
 	while (tk < pendingNb)
 	{
 		toInsert = pending[tk];
-		insertIndex = _binarySearchIndex(main, toInsert, tk);
-		if (insertIndex != -1)
-			main.insert(main.begin() + insertIndex, toInsert);
+		insertIndex = _binarySearchIndex(main, toInsert, main.size() - 1);
+		#if PRINTSTEP
+		printcoldep(depth, IWHITE, tk);
+		_printVec(main, "main", depth, insertIndex, insertIndex, GREEN);
+		_printVec(pending, "pending", depth, tk, tk, GREY);
+		#endif
+		main.insert(main.begin() + insertIndex, toInsert);
 		pending.erase(pending.begin() + tk);
 		--pendingNb;
 		++k;
-		tk = computeJacobstahl(k);
-		_printVec(pending, "pending", depth, tk, tk, RED);
-		_printVec(main, "main", depth, insertIndex, insertIndex, GREEN);
+		tk = _jacob[k];
 	}
-	printcol(depth, BLUEBACK, "step 4b - Inserting remaining elements of pending");
+	#if PRINTSTEP
+	printcoldep(depth, IWHITE, "step 4b - Inserting remaining elements of pending");
+	#endif
 	if (pendingNb > 0)
 	{
 		for (std::vector<int>::reverse_iterator it = pending.rbegin(); it != pending.rend(); ++it)
 		{
-			int insertIndex = _binarySearchIndex(main, *it, pending.size());
+			start = clock();
+			int insertIndex = _binarySearchIndex(main, *it, main.size() - 1);
 			main.insert(main.begin() + insertIndex, *it);
-			_printVec(pending, "pending", depth, std::distance(pending.begin(), it.base()) -1, pending.size() - 1, RED);
+			end = clock();
+			_timeToInsert += double(end - start) / double(CLOCKS_PER_SEC);
+			#if PRINTSTEP
 			_printVec(main, "main", depth, insertIndex, insertIndex, GREEN);
+			_printVec(pending, "pending", depth, std::distance(pending.begin(), it.base()) -1, pending.size() - 1, GREY);
+			#endif
 		}
 	}
+	end = clock();
+	_timeToInsert += double(end - start) / double(CLOCKS_PER_SEC);
+}
 
-	_printVec(main, "main sorted", depth, -1, -1, YELLOW);
+void	PmergeMe::_sortVec(std::vector<int>& v, std::vector<int>* sorted, int depth)
+{
+	if (_checkEndOfRecursion(v, sorted, depth))
+		return ;
+
+	std::vector<std::pair<int, int> >	pairs;
+	_sortPairs(v, pairs, depth);
+
+	std::vector<int> main;
+	_sortBiggest(v.size(), main, pairs, depth);
+	
+	std::vector<int> pending;
+	_createPending(v, pending, pairs, depth);
+
+	_binaryInsert(main, pending, depth);
+
 	*sorted = main;
 }
 

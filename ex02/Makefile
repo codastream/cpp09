@@ -91,7 +91,7 @@ $(NAME): $(OBJS)
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp | $(DIRS)
 	@mkdir -p $(BUILD_DIR)
 	@if [ $(NB_COMP) -eq 1 ]; then echo "$(BOLD)Compilation of source files :$(NOC)";fi
-	$(eval PERCENT=$(shell expr $(NB_COMP)00 "/" $(TO_COMP)))
+	$(eval PERCENT=$(shell if [ $(TO_COMP) -eq 0 ]; then echo 100; else expr $(NB_COMP)00 "/" $(TO_COMP); fi))
 	@if [ $(PERCENT) -le 30 ]; then echo -n "$(RED)"; elif [ $(PERCENT) -le 66 ]; then echo -n "$(YELLOW)"; elif [ $(PERCENT) -gt 66 ]; then echo -n "$(GREEN)"; fi
 	@echo -n "\r"; for i in $$(seq 1 $$(/usr/bin/tput cols)); do echo -n " "; done
 	@echo -n "\r"; for i in $$(seq 1 25); do if [ $$(expr $$i "*" 4) -le $(PERCENT) ]; then echo -n "█"; else echo -n " "; fi; done; echo -n "";
@@ -99,6 +99,9 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp | $(DIRS)
 	@echo -n "$(NOC)"
 	@$(CC) $(CXXFLAGS) $(INC) $< -c -o $@
 	$(eval NB_COMP=$(shell expr $(NB_COMP) + 1))
+
+printstep: CXXFLAGS += -DPRINTSTEP=1
+printstep: clean all
 
 clean:
 	@echo "$(RED)Remove objects$(NOC)"
@@ -111,4 +114,4 @@ fclean: clean
 re: fclean
 	@make
 
-.PHONY: all clean fclean re $(DIRS)
+.PHONY: all clean fclean re $(DIRS) printstep
