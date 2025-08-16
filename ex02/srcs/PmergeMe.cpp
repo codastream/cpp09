@@ -147,7 +147,7 @@ void	PmergeMe::doSort()
 	printTitle(BLUE, "Input size (n)");
 	std::cout << n << std::endl;
 	printTitle(BLUE, "Expected complexity");
-	std::cout << BLUE << "theoretical best = O (n log n −1.4427n)\t" << NC << n * std::log(n) - 1.4427 * n << std::endl;
+	std::cout << BLUE << "theoretical best = O (n log(n))\t" << NC << n * std::log(n) << std::endl;
 	printTitle(BLUE, "Nb of comparisons");
 	std::cout << BLUE << "merge\t" << NC << _compMerge << std::endl;
 	std::cout << BLUE << "insert\t" << NC << _compInsert << std::endl;
@@ -224,6 +224,7 @@ void	PmergeMe::_sortBiggest(size_t vSize, std::vector<int>& main, std::vector<st
 	_printVec(vBig, "biggest", depth, -1, -1, YELLOW);
 	#endif
 	_sortVec(vBig, &main, depth + 1);
+	
 }
 
 void	PmergeMe::_createPending(std::vector<int>& v, std::vector<int>& pending, std::vector<std::pair<int, int> >&	pairs, int depth)

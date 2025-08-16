@@ -1,11 +1,11 @@
-#ifndef UTIL_HPP
-# define UTIL_HPP
+#ifndef COLORS_H
+#define COLORS_H
 
-#include <string>
 #include <iostream>
-#include <iomanip>
+#include <string>
 
-# define DEBUG		true
+// reset
+#define NC				"\033[0m"
 
 // foreground colors
 #define FG_BLACK		"\033[30m"
@@ -30,10 +30,13 @@
 #define BG_DEFAULT		"\033[49m"
 
 // bold colors
-#define BWHITE			"\e[1;37m"
-#define BCYAN			"\e[1;36m"
-#define BPURPLE			"\e[1;35m"
-#define BBLUE			"\e[1;34m"
+#define B_WHITE			"\e[1;37m"
+#define B_CYAN			"\e[1;36m"
+#define B_PURPLE		"\e[1;35m"
+#define B_BLUE			"\e[1;34m"
+
+// italic colors
+#define IWHITE			"\e[3;37m"
 
 // color with effect
 #define PURPLE_BLINK	"\033[5;35m"
@@ -55,34 +58,5 @@
 #define REVERSE_OFF		"\033[27m"
 #define HIDE_OFF		"\033[28m"
 #define ERASE_LINE		"\033[K"
-
-#define NC				"\033[0m"
-#define RED				"\033[31m"
-#define BLUE			"\033[34m"
-#define CYAN			"\033[36m"
-#define BLACK			"\033[30m"
-#define GREY			"\033[38;5;242m"
-#define ORANGE			"\033[38;5;208m"
-#define WHITE			"\033[37m"
-#define GREEN			"\033[32m"
-#define YELLOW			"\033[33m"
-#define MAGENTA			"\e[35m"
-#define PURPLE			"\e[0;35m"
-
-#define YELLOWBACK		"\e[43m"
-#define REDBACK			"\e[101m"
-#define PURPLEBACK		"\e[105m"
-#define BLUEBACK		"\e[104m"
-
-#define IWHITE			"\e[3;37m"
-
-
-
-void	printnl(const std::string &s);
-void	printcol(const std::string& col, const std::string& msg);
-void	printTitle(const std::string& col, const std::string& msg);
-void	printcoldep(int depth, const std::string& col, const std::string& msg);
-void	printcoldep(int depth, const std::string& col, int msg);
-void	puterr();
 
 #endif
