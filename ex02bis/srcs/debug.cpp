@@ -16,7 +16,7 @@ bool	isFirstNbOfPair(size_t i, size_t elemSize)
 	return (i + elemSize * 2) % (elemSize * 2) == 0;
 }
 
-bool	isLastNbOfSecondPair(size_t i, size_t elemSize)
+bool	isLastNbOfPair(size_t i, size_t elemSize)
 {
 	return (i + 1) % (elemSize * 2) == 0;
 }

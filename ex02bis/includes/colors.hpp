@@ -17,6 +17,7 @@
 #define CYAN			"\033[36m"
 #define WHITE			"\033[37m"
 #define DEFAULT			"\033[39m"
+#define GREY			"\033[90m"
 
 // background colors
 #define BG_BLACK		"\033[40m"

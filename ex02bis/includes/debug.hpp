@@ -10,14 +10,14 @@
 
 bool	isLastNbOfElem(size_t i, size_t elemSize);
 bool	isFirstNbOfPair(size_t i, size_t elemSize);
-bool	isLastNbOfSecondPair(size_t i, size_t elemSize);
+bool	isLastNbOfPair(size_t i, size_t elemSize);
 bool	isOdd(size_t i, size_t elemSize, size_t dataSize, size_t nbElems);
 bool	isLastNbOfOdd(size_t i, size_t elemSize, size_t dataSize, size_t nbElems);
 
 void	printDepthOffset(int depth);
 
 template <typename C>
-void	printByPair(const std::string& msgCol, const C& data, int depth, size_t elemSize);
+void	printByPair(const std::string& msgCol, const C& data, int depth, size_t elemSize, bool showMax = false);
 
 template <typename C>
 void	printData(const std::string& msgCol, const C& data, int depth, size_t elemSize, bool showMax = false);

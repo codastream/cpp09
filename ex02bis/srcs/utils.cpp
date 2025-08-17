@@ -7,7 +7,7 @@ void	printcol(const std::string& col, const std::string& msg)
 
 void	printTitle(const std::string& col, const std::string& msg)
 {
-	std::cout << col << "=====" << std::left << std::setw(20) << msg << "=====" NC << std::endl;
+	std::cout << col << std::left << std::setw(80) << std::setfill('=') << msg << std::setfill(' ') << NC << std::endl;
 }
 
 void	puterr()

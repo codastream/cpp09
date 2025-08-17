@@ -134,7 +134,7 @@ void	PmergeMe::_merge(t_vec& data, size_t elemSize)
 			swapPairs(itFirst, itSecond, elemSize);
 	}
 	#ifdef DEBUG
-	printByPair(BLUE "after merge:\t", data, 0, elemSize);
+	printByPair(BLUE "after merge:\t", data, 0, elemSize, true);
 	#endif
 }
 
