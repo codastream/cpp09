@@ -2,8 +2,7 @@
 
 void printDepthOffset(int depth)
 {
-	for (int i = 0; i < depth; ++i)
-		std::cout << " ";
+	std::cout << GREY << std::right << std::setfill('-') << std::setw(75) << "depth " << std::setfill(' ') << std::setw(5) << depth  << NC << std::endl;
 }
 
 bool	isLastNbOfElem(size_t i, size_t elemSize)

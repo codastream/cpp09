@@ -42,7 +42,7 @@ class PmergeMe {
 		void		initVec(int ac, char **av);
 
 		template <typename C>
-		void		sort(C& data);
+		void		sort(C* data);
 		
 	private:
 
@@ -65,10 +65,10 @@ class PmergeMe {
 		bool					_isOngoingBissect(T start, T end);
 
 		template <typename C>
-		void 					_sortRecursive(C& data, size_t elemSize);
+		void 					_sortRecursive(C* data, size_t elemSize, int depth);
 
-		void					_merge(t_vec& data, size_t elemSize);
-		void					_insert(t_vec& data, size_t elemSize);
+		void					_merge(t_vec* data, size_t elemSize, int depth);
+		void					_insert(t_vec* data, size_t elemSize, int depth);
 };
 
 #include "PmergeMe.tpp"

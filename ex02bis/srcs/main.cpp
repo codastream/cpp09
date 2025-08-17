@@ -54,12 +54,12 @@ int	main(int ac, char** av)
 
 	printTitle(CYAN, "Before sort");
 	miVec.initVec(n, ++av);
-	printData("unsorted:\t", miVec.vec, 0, 1);
+	printData("unsorted:\t", &(miVec.vec), 0, 1);
 
-	miVec.sort(miVec.vec);
+	miVec.sort(&(miVec.vec));
 
 	printTitle(CYAN, "After sort");
-	printData("sorted:\t\t", miVec.vec, 0, 1);
+	printData("sorted:\t\t", &(miVec.vec), 0, 1);
 
 	printTitle(CYAN, "Expected complexity");
 	std::cout << BLUE << "theoretical worst case = O (n log2(n) + sum(3/4n))\t" << NC << computeMaxComparisons(n) << std::endl;

@@ -1,14 +1,14 @@
 template <typename C>
-void	printByPair(const std::string& msgCol, const C& data, int depth, size_t elemSize, bool showMax)
+void	printByPair(const std::string& msgCol, const C* data, int depth, size_t elemSize, bool showMax)
 {
-	printDepthOffset(depth);
-	std::cout << msgCol << YELLOW;
+	(void) depth;
 
+	std::cout << msgCol << YELLOW;
 	const char* maxCol = showMax ? CYAN : YELLOW;
-	int	width = 7;
-	size_t dataSize = data.size();
+	int	width = 8;
+	size_t dataSize = data->size();
 	size_t nbElems = dataSize / elemSize;
-	typename C::const_iterator it = data.begin();
+	typename C::const_iterator it = data->begin();
 	for (size_t i = 0; i < dataSize; ++i, ++it)
 	{
 		if (isOdd(i, elemSize, dataSize, nbElems))
@@ -26,14 +26,14 @@ void	printByPair(const std::string& msgCol, const C& data, int depth, size_t ele
 }
 
 template <typename C>
-void	printData(const std::string& msgCol, const C& data, int depth, size_t elemSize, bool showMax)
+void	printData(const std::string& msgCol, const C* data, int depth, size_t elemSize, bool showMax)
 {
-	printDepthOffset(depth);
-	std::cout << msgCol << YELLOW;
+	(void) depth;
 
-	int	width = 6;
-	size_t dataSize = data.size();
-	typename C::const_iterator it = data.begin();
+	std::cout << msgCol << YELLOW;
+	int	width = 7;
+	size_t dataSize = data->size();
+	typename C::const_iterator it = data->begin();
 	for (size_t i = 0; i < dataSize; ++i)
 	{
 		if (showMax && i == elemSize * 2 - 1)
