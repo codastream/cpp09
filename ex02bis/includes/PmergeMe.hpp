@@ -25,41 +25,50 @@ class PmergeMe {
 
 
 	public:
+		double					timeToMerge;
+		double					timeToInsert;
+
+		int						nbCompMerge;
+		int						nbCompInsert;
+
+		t_vec					vec;
+
 		PmergeMe();
 		~PmergeMe();
 		PmergeMe(const PmergeMe& other);
 
-		PmergeMe& operator=(const PmergeMe& other);
+		PmergeMe& 	operator=(const PmergeMe& other);
 
-
+		void		initVec(int ac, char **av);
 
 		template <typename C>
-		static void sort(C& data);
+		void		sort(C& data);
 		
 	private:
-		t_vec				_vec;
-		t_vec				_jacob;
-		double				_timeToMerge;
-		double				_timeToInsert;
 
-		static int			_nbCompMerge;
-		static int			_nbCompInsert;
+		static const int		_jacobLen;
+		static std::vector<int>	_generateJSequence();
 
-		static const int	_jacobLen;
 
-		size_t 				_computeBatchSize(size_t n);
+		t_vec					_jacob;
+
+		size_t 					_computeBatchSize(size_t n);
+		t_vec::iterator			_binarySearchIt(t_vec& main, size_t start, size_t end, int val);
 		
 		template <typename T>
-		bool				_isFirstLowerMerge(T lv, T rv);
+		bool					_isGreaterMerge(T lv, T rv);
 
 		template <typename T>
-		bool				_isFirstLowerInsert(T lv, T rv);
+		bool					_isGreaterInsert(T lv, T rv);
 		
+		template <typename T>
+		bool					_isOngoingBissect(T start, T end);
+
 		template <typename C>
-		static void 		_sortRecursive(C& data, size_t elemSize);
+		void 					_sortRecursive(C& data, size_t elemSize);
 
-		static void			_merge(t_vec& data, size_t elemSize);
-		static void			_insert(t_vec& data, size_t elemSize);
+		void					_merge(t_vec& data, size_t elemSize);
+		void					_insert(t_vec& data, size_t elemSize);
 };
 
 #include "PmergeMe.tpp"

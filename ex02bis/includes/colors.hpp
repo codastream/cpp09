@@ -8,15 +8,15 @@
 #define NC				"\033[0m"
 
 // foreground colors
-#define FG_BLACK		"\033[30m"
-#define FG_RED			"\033[31m"
-#define FG_GREEN		"\033[32m"
-#define FG_YELLOW		"\033[33m"
-#define FG_BLUE			"\033[34m"
-#define FG_PURPLE		"\033[35m"
-#define FG_CYAN			"\033[36m"
-#define FG_WHITE		"\033[37m"
-#define FG_DEFAULT		"\033[39m"
+#define BLACK			"\033[30m"
+#define RED				"\033[31m"
+#define GREEN			"\033[32m"
+#define YELLOW			"\033[33m"
+#define BLUE			"\033[34m"
+#define PURPLE			"\033[35m"
+#define CYAN			"\033[36m"
+#define WHITE			"\033[37m"
+#define DEFAULT			"\033[39m"
 
 // background colors
 #define BG_BLACK		"\033[40m"
@@ -36,7 +36,7 @@
 #define B_BLUE			"\e[1;34m"
 
 // italic colors
-#define IWHITE			"\e[3;37m"
+#define I_WHITE			"\e[3;37m"
 
 // color with effect
 #define PURPLE_BLINK	"\033[5;35m"

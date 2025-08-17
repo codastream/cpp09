@@ -1,36 +1,49 @@
-#include "PmergeMe.hpp"
-
 template <typename C>
 void PmergeMe::_sortRecursive(C& data, size_t elemSize)
 {
 	clock_t start;
+	size_t	nbElems;
+
+	nbElems = data.size() / elemSize;
+	if (nbElems < 2)
+		return ;
+	start = clock();
+	_merge(data, elemSize);
+	timeToMerge += clock() - start;
+
+	_sortRecursive(data, elemSize * 2);
+
+	if (nbElems < 3)
+		return ;
 
 	start = clock();
-	merge(data, elemSize);
-	_timeToMerge += clock() - start;
-
-	start = clock();
-	insert(data, elemSize);
-	_timeToInsert += clock() - start;
+	_insert(data, elemSize);
+	timeToInsert += clock() - start;
 }
-
 
 template <typename C>
-void PmergeMe::_insert(C& data, size_t elemSize)
+void PmergeMe::sort(C& data)
 {
-
+	_sortRecursive(data, 1);
 }
 
 template <typename T>
-bool PmergeMe::_isFirstLowerMerge(T lv, T rv)
+bool PmergeMe::_isGreaterMerge(T lv, T rv)
 {
-	PmergeMe::_nbCompMerge++;
-	return *lv < *rv;
+	nbCompMerge++;
+	return lv > rv;
 }
 
 template <typename T>
-bool PmergeMe::_isFirstLowerInsert(T lv, T rv)
+bool PmergeMe::_isOngoingBissect(T start, T end)
 {
-	PmergeMe::_nbCompInsert++;
-	return *lv < *rv;
+	nbCompMerge++;
+	return start <= end;
+}
+
+template <typename T>
+bool PmergeMe::_isGreaterInsert(T lv, T rv)
+{
+	nbCompInsert++;
+	return *lv > *rv;
 }
