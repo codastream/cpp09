@@ -14,13 +14,13 @@ void	printByPair(const std::string& msgCol, const C* data, int depth, size_t ele
 		if (isOdd(i, elemSize, dataSize, nbElems))
 			std::cout << WHITE << std::right << std::setw(width - 1) << *it << " " << NC;
 		else if (isLastNbOfPair(i, elemSize))
-			std::cout << maxCol << std::right << std::setw(width - 1) << *it << GREY << "]" << YELLOW;
+			std::cout << YELLOW << maxCol << std::right << std::setw(width - 1) << *it << GREY << "]" << YELLOW;
 		else if (isFirstNbOfPair(i, elemSize))
 			std::cout << GREY << "[" << YELLOW << std::right << std::setw(width - 2) << *it << " " << NC;
 		else if (isLastNbOfElem(i, elemSize) && !isLastNbOfOdd(i, elemSize, dataSize, nbElems))
 			std::cout << YELLOW << BOLD_ON << std::right << std::setw(width - 1) << *it << BOLD_OFF << GREY << "," << YELLOW;
 		else
-			std::cout << std::right << std::setw(width - 1) << *it << " ";
+			std::cout << YELLOW << std::right << std::setw(width - 1) << *it << " ";
 	}
 	std::cout << NC << std::endl;
 }

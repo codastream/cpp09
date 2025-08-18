@@ -51,6 +51,16 @@ PmergeMe& PmergeMe::operator=(const PmergeMe& other)
 // 		std::swap(*itMax--, *itMin--);
 // }
 
+static size_t getIndexOfFirstNb(size_t elemIndex, size_t elemSize)
+{
+	return (elemIndex * elemSize);
+}
+
+static size_t getIndexOfLastNb(size_t elemIndex, size_t elemSize)
+{
+	return ((elemIndex + 1) * elemSize - 1);
+}
+
 static void	insertElemAtBack(t_vec& main, t_vec& data, size_t elemSize, size_t fromIndex)
 {
 	for (size_t i = 0; i < elemSize && data[fromIndex]; ++i, ++fromIndex)
@@ -130,7 +140,7 @@ size_t	PmergeMe::_binarySearch(t_vec& main, size_t start, size_t end, int val, s
 		{
 			// what if mid >= elemSize
 			end = mid - elemSize;
-			insertIdx = mid - elemSize;
+			insertIdx = end;
 			std::cout << "above val => setting end to " << end << " insert index now " << insertIdx << "\n";
 		}
 		else
@@ -140,7 +150,6 @@ size_t	PmergeMe::_binarySearch(t_vec& main, size_t start, size_t end, int val, s
 			std::cout << "below val => setting start to " << start << " insert index now " << insertIdx << "\n";
 		}
 	}
-	insertIdx += 1;
 	std::cout << "for val " << val << " now bounded by start=" << start << " and end=" << end << " insertIdx = " << insertIdx << std::endl;
 	return insertIdx;
 }
@@ -211,7 +220,7 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 	std::cout << "pending nb is " << pendingNb << "\n";
 	while (batchSize <= pendingNb)
 	{
-		i = k * elemSize + 1;
+		i = getIndexOfLastNb(tk - 1, elemSize);
 		while (batchSize > 0 && i < data->size())
 		{
 			toInsert = (*data)[i];
@@ -220,7 +229,7 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 			std::cout << "trying to Insert " << toInsert << "\n";
 			insertOffset = _binarySearch(main, elemSize - 1, tk * elemSize + elemSize - 1, toInsert, elemSize);
 			std::cout << "... should be inserted at i " << insertOffset << std::endl;
-			fromIndex = i - elemSize + 1;
+			fromIndex = getIndexOfFirstNb(tk - 1, elemSize);
 			insertElemAtPos(main, data, elemSize, fromIndex, insertOffset);
 			i -= pairSize;
 			--pendingNb;
@@ -233,9 +242,9 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 		batchSize = tk - _jacob[k - 1];
 	}
 	if (k > 3)
-		i = k * elemSize;
+		i = tk * elemSize;
 	else
-		i = 3 * elemSize - 1;
+		i = getIndexOfLastNb(2, elemSize);
 	#ifdef DEBUG
 	printData(BLUE "before insert remaining:\t", &main, depth, elemSize);
 	#endif
