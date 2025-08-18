@@ -51,7 +51,7 @@ PmergeMe& PmergeMe::operator=(const PmergeMe& other)
 // 		std::swap(*itMax--, *itMin--);
 // }
 
-static void	insertRangeAtBack(t_vec& main, t_vec& data, size_t elemSize, size_t fromIndex)
+static void	insertElemAtBack(t_vec& main, t_vec& data, size_t elemSize, size_t fromIndex)
 {
 	for (size_t i = 0; i < elemSize && data[fromIndex]; ++i, ++fromIndex)
 	{
@@ -59,12 +59,12 @@ static void	insertRangeAtBack(t_vec& main, t_vec& data, size_t elemSize, size_t 
 	}
 }
 
-static void insertRangeAtPos(t_vec& main, t_vec& data, size_t elemSize, size_t fromIndex, t_vec::iterator destPos)
+static void insertElemAtPos(t_vec& main, t_vec* data, size_t elemSize, size_t fromIndex, size_t insertOffset)
 {
-	for (size_t i = 0; i < elemSize && fromIndex + 1 < data.size(); ++i, --fromIndex)
+	for (size_t i = 0; i < elemSize && fromIndex < data->size(); ++i, ++fromIndex)
 	{
-		std::cout << "adding " << data[fromIndex] << " from index " << fromIndex << "\n";
-		main.insert(destPos, data[fromIndex]);
+		std::cout << "adding " << (*data)[fromIndex] << " from index " << fromIndex << "\n";
+		main.insert(main.begin() + insertOffset + i, (*data)[fromIndex]);
 		printData("main :", &main, 0, elemSize);
 	}
 }
@@ -73,16 +73,21 @@ static void insertRangeAtPos(t_vec& main, t_vec& data, size_t elemSize, size_t f
 /// @param main 
 /// @param data 
 /// @param elemSize 
-static void	fillMain(t_vec& main, t_vec* data, size_t elemSize)
+static void	fillMain(t_vec& main, t_vec* data, size_t elemSize, size_t nbElem)
 {
+	(void) nbElem;
 	size_t	dataSize = data->size();
 	size_t	pairSize = elemSize * 2;
+	std::cout << "pair size " << pairSize << std::endl;
 	
-	insertRangeAtBack(main, *data, elemSize, 0);
+	insertElemAtBack(main, *data, elemSize, 0);
 	// std::cout << "adding to main " << data[elemSize - 1] << "\n";
-	for (size_t i = elemSize; i <= dataSize - elemSize; i += pairSize)
+	printData("main :", &main, 0, elemSize);
+	for (size_t i = elemSize; i < dataSize; i += pairSize)
 	{
-		insertRangeAtBack(main, *data, elemSize, i);
+		std::cout << "adding one elem from data index " << i << " into main\n"; 
+		insertElemAtBack(main, *data, elemSize, i);
+		printData("main :", &main, 0, elemSize);
 	}
 }
 
@@ -111,25 +116,33 @@ size_t PmergeMe::_computeBatchSize(size_t n)
 	return (_jacob[n] - _jacob[n - 1]);
 }
 
-t_vec::iterator	PmergeMe::_binarySearchIt(t_vec& main, size_t start, size_t end, int val)
+size_t	PmergeMe::_binarySearch(t_vec& main, size_t start, size_t end, int val, size_t elemSize)
 {
 	size_t	insertIdx = 0;
-	while (_isOngoingBissect(end, start))
+	std::cout << "searching " << val << " between start=" << start << " and end=" << end << std::endl;
+	while (_isOngoingBissect(start, end))
 	{
-		int mid = start + (end - start) / 2;
+		size_t nbElemsBetweenStartEnd = (end - start) / elemSize;
+		std::cout << "nbElems between start end " << nbElemsBetweenStartEnd << "\n";
+		int mid = start + (nbElemsBetweenStartEnd / 2 * elemSize);
+		std::cout << "now checking mid= " << mid << " main[mid] = " << main[mid] << "...";
 		if (_isGreaterInsert(main[mid], val))
 		{
-			end = mid - 1;
-			insertIdx = mid;
+			// what if mid >= elemSize
+			end = mid - elemSize;
+			insertIdx = mid - elemSize;
+			std::cout << "above val => setting end to " << end << " insert index now " << insertIdx << "\n";
 		}
 		else
 		{
-			start = mid + 1;
-			insertIdx = mid + 1;
+			start = mid + elemSize;
+			insertIdx = mid;
+			std::cout << "below val => setting start to " << start << " insert index now " << insertIdx << "\n";
 		}
 	}
-	std::cout << "for val " << val << " bounded by start=" << start << " and end=" << end << " insertIdx = " << insertIdx << std::endl;
-	return main.begin() + insertIdx;
+	insertIdx += 1;
+	std::cout << "for val " << val << " now bounded by start=" << start << " and end=" << end << " insertIdx = " << insertIdx << std::endl;
+	return insertIdx;
 }
 
 /// @brief creates pairs (min, max)
@@ -149,11 +162,16 @@ void	PmergeMe::_merge(t_vec* data, size_t elemSize, int depth)
 		return ;
 	for (size_t i = 0; i + pairSize <= dataSize; i += pairSize)
 	{
-		t_vec::iterator itFirst = data->begin() + i;
-		t_vec::iterator itSecond = data->begin() + i + elemSize;
+		t_vec::iterator itFirst = data->begin() + i + elemSize - 1;
+		t_vec::iterator itSecond = data->begin() + i + elemSize + elemSize - 1;
 		if (_isGreaterMerge(*itFirst, *itSecond))
 		{
-			std::swap_ranges(itFirst, itFirst + elemSize, itSecond);
+			std::cout << *itFirst << " > " << *itSecond << "...\n";
+			t_vec::iterator maxStart = data->begin() + i;
+			t_vec::iterator maxEnd = data->begin() + i + elemSize;
+			t_vec::iterator minStart = data->begin() + i + elemSize;
+			std::cout << "moving max elem (from " << *maxStart << " to " <<  *maxEnd << ")" << std::endl; 
+			std::swap_ranges(maxStart, maxEnd, minStart);
 		}
 	}
 	#ifdef DEBUG
@@ -166,10 +184,16 @@ void	PmergeMe::_merge(t_vec* data, size_t elemSize, int depth)
 /// @param elemSize 
 void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 {
-	t_vec	main;
-	fillMain(main, data, elemSize);
 	#ifdef DEBUG
 	printData(BLUE "data:\t\t", data, depth, elemSize);
+	#else
+	(void) depth;
+	#endif
+	t_vec					main;
+	size_t					nbElems = data->size() / elemSize;
+	size_t					pairSize = elemSize * 2;
+	fillMain(main, data, elemSize, nbElems);
+	#ifdef DEBUG
 	printData(BLUE "main:\t\t", &main, depth, elemSize);
 	#else
 	(void) depth;
@@ -178,25 +202,28 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 	size_t					k = 3;
 	size_t					tk = _jacob[k];
 	size_t					batchSize = tk - _jacob[k - 1];
-	size_t					nbElems = data->size() / elemSize;
 	size_t					pendingNb = nbElems % 2 == 0 ? (nbElems - 2) / 2 : (nbElems - 2) / 2 + 1;
 	size_t					i;
 	int						toInsert;
-	t_vec::iterator			insertPos;
+	size_t					insertOffset;
 	size_t					fromIndex;
 	
 	std::cout << "pending nb is " << pendingNb << "\n";
 	while (batchSize <= pendingNb)
 	{
-		i = k * elemSize;
+		i = k * elemSize + 1;
 		while (batchSize > 0 && i < data->size())
 		{
 			toInsert = (*data)[i];
-			insertPos = _binarySearchIt(main, 0, tk + 1, toInsert);
+			std::cout << "pending nb is " << pendingNb << "\n";
+			std::cout << "looking at data index " << i << "\n";
+			std::cout << "trying to Insert " << toInsert << "\n";
+			insertOffset = _binarySearch(main, elemSize - 1, tk * elemSize + elemSize - 1, toInsert, elemSize);
+			std::cout << "... should be inserted at i " << insertOffset << std::endl;
 			fromIndex = i - elemSize + 1;
-			insertRangeAtPos(main, *data, elemSize, fromIndex, insertPos);
+			insertElemAtPos(main, data, elemSize, fromIndex, insertOffset);
+			i -= pairSize;
 			--pendingNb;
-			--i;
 			--batchSize;
 		}
 		++k;
@@ -209,13 +236,17 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 		i = k * elemSize;
 	else
 		i = 3 * elemSize - 1;
+	#ifdef DEBUG
+	printData(BLUE "before insert remaining:\t", &main, depth, elemSize);
+	#endif
 	while (pendingNb > 0)
 	{
 		toInsert = (*data)[i];
-		std::cout << "wanting to insert " << toInsert << " from data index " i;
-		insertPos = _binarySearchIt(main, 0, main.size(), toInsert);
-		fromIndex = i;
-		insertRangeAtPos(main, *data, elemSize, fromIndex, insertPos);
+		std::cout << "wanting to insert " << toInsert << " from data index " << i << std::endl;
+		insertOffset = _binarySearch(main, elemSize - 1, main.size() - 1, toInsert, elemSize);
+		std::cout << "... should be inserted at i " << insertOffset << std::endl;
+		fromIndex = i - elemSize + 1;
+		insertElemAtPos(main, data, elemSize, fromIndex, insertOffset);
 		--pendingNb;
 		i += elemSize;
 	}

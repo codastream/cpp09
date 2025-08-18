@@ -42,7 +42,7 @@ template <typename T>
 bool PmergeMe::_isOngoingBissect(T start, T end)
 {
 	nbCompMerge++;
-	return start <= end;
+	return start < end;
 }
 
 template <typename T>

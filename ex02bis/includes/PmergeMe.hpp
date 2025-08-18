@@ -53,7 +53,7 @@ class PmergeMe {
 		t_vec					_jacob;
 
 		size_t 					_computeBatchSize(size_t n);
-		t_vec::iterator			_binarySearchIt(t_vec& main, size_t start, size_t end, int val);
+		size_t					_binarySearch(t_vec& main, size_t start, size_t end, int val, size_t elemSize);
 		
 		template <typename T>
 		bool					_isGreaterMerge(T lv, T rv);
