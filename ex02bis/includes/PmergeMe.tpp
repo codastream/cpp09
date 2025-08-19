@@ -41,12 +41,11 @@ bool PmergeMe::_isGreaterMerge(T lv, T rv)
 template <typename T>
 bool PmergeMe::_isOngoingBissect(T start, T end)
 {
-	nbCompMerge++;
 	return start < end;
 }
 
 template <typename T>
-bool PmergeMe::_isBelowInsert(T found, T target)
+bool PmergeMe::_isMidTooLowInsert(T found, T target)
 {
 	nbCompInsert++;
 	return found < target;

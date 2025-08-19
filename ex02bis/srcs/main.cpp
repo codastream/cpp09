@@ -35,6 +35,18 @@ static int	computeMaxComparisons(size_t n)
 	return sum;
 }
 
+static bool	isSortedAsc(t_vec& v)
+{
+	if (v.size() < 2)
+		return true;
+	for (t_vec::const_iterator it = v.begin() + 1; it != v.end(); ++it)
+	{
+		if (*it < *(it - 1))
+			return false;
+	}
+	return true;
+}
+
 int	main(int ac, char** av)
 {
 	if (!checkArgs(ac, av))
@@ -57,6 +69,12 @@ int	main(int ac, char** av)
 	printData("unsorted:\t", &(miVec.vec), 0, 1);
 
 	miVec.sort(&(miVec.vec));
+
+	if (!isSortedAsc(miVec.vec))
+		std::cout << RED << "not sorted !" << NC << std::endl;
+	else
+		std::cout << GREEN << "sorted !" << NC << std::endl;
+
 
 	printTitle(CYAN, "After sort");
 	printData("sorted:\t\t", &(miVec.vec), 0, 1);

@@ -91,8 +91,7 @@ static void	fillMain(t_vec& main, t_vec* data, size_t elemSize, size_t nbElem)
 	insertElemAtBack(main, *data, elemSize, 0);
 	// std::cout << "adding to main " << data[elemSize - 1] << "\n";
 	printData("adding max elems:", &main, 0, elemSize);
-	size_t i = elemSize;
-	for (; i <= dataSize - pairSize; i += pairSize)
+	for (size_t i = elemSize; i <= dataSize - elemSize; i += pairSize)
 	{
 		std::cout << "adding one elem from data index " << i << " into main\n"; 
 		insertElemAtBack(main, *data, elemSize, i);
@@ -127,39 +126,33 @@ size_t PmergeMe::_computeBatchSize(size_t n)
 
 size_t	PmergeMe::_binarySearch(t_vec& main, size_t start, size_t end, int val, size_t elemSize)
 {
-	size_t	insertIdx = start;
+	size_t	insertIdx = 0;
 	size_t nbElemsBetweenStartEnd = (end - start) / elemSize;
 	int mid = start + (nbElemsBetweenStartEnd / 2 * elemSize);
 	while (_isOngoingBissect(start, end))
 	{
-		insertIdx = start;
 		nbElemsBetweenStartEnd = (end - start) / elemSize;
 		mid = start + (nbElemsBetweenStartEnd / 2 * elemSize);
-		std::cout << "searching " << CYAN << val << NC << " between start=" << start << " and end=" << end << std::endl;
+		std::cout << "searching " << CYAN << val << NC << " between start=" << start << " and end=" << end << " mid = " << mid << std::endl;
 		std::cout << "nbElems between start end " << nbElemsBetweenStartEnd << "\n";
-		std::cout << "now checking mid= " << mid << " main[mid] = " << main[mid] << "...";
-		if (_isBelowInsert(main[mid], val))
+		std::cout << "now checking main[" << mid << "]=" << main[mid] << "...";
+		if (_isMidTooLowInsert(main[mid], val))
 		{
 			start = mid + elemSize;
-			mid = start;
+			insertIdx = start;
 			// nbElemsBetweenStartEnd = (end - start) / elemSize;
 			// mid = start + (nbElemsBetweenStartEnd / 2 * elemSize);
-			insertIdx = mid;
-			std::cout << RED << "below" NC << " val => setting start to " << start << " insert index now " << insertIdx << "\n";
+			std::cout << RED << "below" NC << val << "=> setting start to " << start << " insert index now " << insertIdx << "\n";
 		}
 		else
 		{
 			// what if mid >= elemScize
-			end = mid - elemSize;
-			mid = end;
+			end = mid;
 			// nbElemsBetweenStartEnd = (end - start) / elemSize;
 			// mid = start + (nbElemsBetweenStartEnd / 2 * elemSize);
-			insertIdx = mid;
-			std::cout << BLUE << "above" << NC << " val => setting end to " << end << " insert index now " << insertIdx << "\n";
+			std::cout << BLUE << "above" << NC << val << "=> setting end to " << end << " insert index now " << insertIdx << "\n";
 		}
 	}
-	if (insertIdx != 0) 
-		insertIdx -= 1;
 	std::cout << "for val " << val << " now bounded by start=" << start << " and end=" << end << " insertIdx = " << insertIdx << std::endl;
 	return insertIdx;
 }
@@ -230,6 +223,8 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 	std::cout << PURPLE << "\ninsertion.." << NC << "\n";
 	while (batchSize <= pendingNb)
 	{
+		std::cout << PURPLE << "\ninsert Jacobstahl for tk = " << k << NC << "\n";
+
 		i = getIndexOfLastNb((tk - 1) * 2, elemSize);
 		std::cout << BOLD_ON << "starting batch from index " << i << BOLD_OFF "\n";
 		while (batchSize > 0 && i < data->size())
@@ -237,7 +232,7 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 			toInsert = (*data)[i];
 			std::cout << "pending nb is " << pendingNb << "\n";
 			std::cout << "looking at data index " << i << "\n";
-			std::cout << "trying to Insert " << toInsert << "\n";
+			std::cout << CYAN << "trying to Insert " << toInsert << NC << "\n";
 			insertOffset = _binarySearch(main, elemSize - 1, tk * elemSize + elemSize - 1, toInsert, elemSize);
 			std::cout << "... should be inserted at i " << insertOffset << std::endl;
 			fromIndex = i - elemSize + 1;
