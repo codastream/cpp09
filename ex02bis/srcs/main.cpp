@@ -22,7 +22,6 @@ static bool	checkArgs(int ac, char **av)
 }
 
 /// @brief compute the theoretical min nb of comparisons, which is ceil(log2(n!))
-/// 	which with Stirling's approximation is around n log2 n − 1.44 n + O(log n)
 /// @param n number of elements to be sorted
 /// @return aggregated number of comparisons
 static int	computeMinComparisons(size_t n)
@@ -66,30 +65,40 @@ int	main(int ac, char** av)
 
 	printTitle(BG_CYAN, "vector");
 
-	printTitle(CYAN, "Before sort");
+	printTitle(CYAN, "Before");
 	miVec.initVec(n, ++av);
-	printData("unsorted:\t", &(miVec.vec), 0, 1);
+	printData("data:\t", &(miVec.vec), 0, 1);
 
 	miVec.sort(&(miVec.vec));
 
-	if (!isSortedAsc(miVec.vec))
+	#ifdef DEBUG
+	if (!isSortedAsc(miVec.vec) || miVec.vec.size() != static_cast<unsigned long>(n))
 		std::cout << RED << "not sorted !" << NC << std::endl;
 	else
 		std::cout << GREEN << "sorted !" << NC << std::endl;
+	#else
+	(void) isSortedAsc;
+	(void) computeMinComparisons;
+	#endif
 
+	printTitle(CYAN, "After");
+	printData("sorted:\t", &(miVec.vec), 0, 1);
 
-	printTitle(CYAN, "After sort");
-	printData("sorted:\t\t", &(miVec.vec), 0, 1);
-
-	printTitle(CYAN, "Expected complexity");
+	#ifdef DEBUG
+	printTitle(CYAN, "Expected theoretical complexity if n <= 12");
 	std::cout << BLUE << "theoretical min\t" << NC << computeMinComparisons(n) << std::endl;
 
 	printTitle(CYAN, "Nb of comparisons");
 	std::cout << BLUE << "merge\t" << NC << miVec.nbCompMerge << std::endl;
 	std::cout << BLUE << "insert\t" << NC << miVec.nbCompInsert << std::endl;
 	std::cout << B_BLUE << "total\t" << NC << miVec.nbCompMerge + miVec.nbCompInsert << std::endl;
+	#endif
 
-	printTitle(CYAN, "Compute time");
+	std::ostringstream oss;
+	std::string msg;
+	oss << "Time to process a range of " << n << " with std::vector";
+	msg = oss.str();
+	printTitleCompute(CYAN, msg);
 	std::cout << BLUE << "merge\t" << NC << std::fixed << std::setprecision(5) << miVec.timeToMerge << " µsec" << std::endl;
 	std::cout << BLUE << "insert\t" << NC << std::fixed << std::setprecision(5) << miVec.timeToInsert << " µsec" << std::endl;
 	std::cout << B_BLUE << "total\t" << NC << std::fixed << std::setprecision(5) << miVec.timeToMerge + miVec.timeToInsert << " µsec" << std::endl;

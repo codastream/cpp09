@@ -5,7 +5,9 @@ void PmergeMe::_sortRecursive(C* data, size_t elemSize, int depth)
 	size_t	nbElems;
 	nbElems = data->size() / elemSize;
 
+	#ifdef DEBUG
 	printDepthOffset(depth);
+	#endif
 
 	if (nbElems < 2)
 		return ;
@@ -15,7 +17,9 @@ void PmergeMe::_sortRecursive(C* data, size_t elemSize, int depth)
 
 	_sortRecursive(data, elemSize * 2, depth + 1);
 
+	#ifdef DEBUG
 	printDepthOffset(depth);
+	#endif
 
 	if (nbElems < 3)
 		return ;

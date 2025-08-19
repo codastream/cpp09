@@ -9,6 +9,8 @@
 #include <iomanip>
 #include <cmath>
 
+#define DEB 1
+
 bool	isLastNbOfElem(size_t i, size_t elemSize);
 bool	isFirstNbOfPair(size_t i, size_t elemSize);
 bool	isLastNbOfPair(size_t i, size_t elemSize);

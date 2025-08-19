@@ -23,7 +23,8 @@ bool	isLastNbOfPair(size_t i, size_t elemSize)
 bool	isOdd(size_t i, size_t elemSize, size_t dataSize)
 {
 	size_t pairSize = elemSize * 2;
-	return (dataSize / pairSize % 2 != 0 && i >  dataSize - pairSize);
+	size_t nbPair = dataSize / pairSize;
+	return (dataSize / pairSize % 2 != 0 && i >= (nbPair * pairSize));
 }
 
 bool	isLastNbOfOdd(size_t i, size_t elemSize, size_t dataSize, size_t nbElems)
