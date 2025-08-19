@@ -59,8 +59,17 @@ class PmergeMe {
 		bool					_isGreaterMerge(T lv, T rv);
 
 		template <typename T>
-		bool					_isMidTooLowInsert(T lv, T rv);
+		bool					_isLowerInsert(T lv, T rv);
+
+		template <typename T>
+		bool					_isEqualInsert(T lv, T rv);
 		
+		template <typename T>
+		bool					_isUpperInsert(T lv, T rv);
+
+		template <typename T>
+		bool					_isBeyondLast(T startIdx, T endIdx);
+
 		template <typename T>
 		bool					_isOngoingBissect(T start, T end);
 

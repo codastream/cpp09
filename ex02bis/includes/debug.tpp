@@ -11,14 +11,14 @@ void	printByPair(const std::string& msgCol, const C* data, int depth, size_t ele
 	typename C::const_iterator it = data->begin();
 	for (size_t i = 0; i < dataSize; ++i, ++it)
 	{
-		if (isOdd(i, elemSize, dataSize, nbElems))
+		if (isOdd(i, elemSize, dataSize))
 			std::cout << WHITE << std::right << std::setw(width - 1) << *it << " " << NC;
 		else if (isLastNbOfPair(i, elemSize))
 			std::cout << YELLOW << maxCol << std::right << std::setw(width - 1) << *it << GREY << "]" << YELLOW;
 		else if (isFirstNbOfPair(i, elemSize))
 			std::cout << GREY << "[" << YELLOW << std::right << std::setw(width - 2) << *it << " " << NC;
 		else if (isLastNbOfElem(i, elemSize) && !isLastNbOfOdd(i, elemSize, dataSize, nbElems))
-			std::cout << YELLOW << BOLD_ON << std::right << std::setw(width - 1) << *it << BOLD_OFF << GREY << "," << YELLOW;
+			std::cout << YELLOW << std::right << std::setw(width - 1) << *it << GREY << "," << YELLOW;
 		else
 			std::cout << YELLOW << std::right << std::setw(width - 1) << *it << " ";
 	}

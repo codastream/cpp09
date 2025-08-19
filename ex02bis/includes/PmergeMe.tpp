@@ -32,21 +32,43 @@ void PmergeMe::sort(C* data)
 }
 
 template <typename T>
-bool PmergeMe::_isGreaterMerge(T lv, T rv)
+bool	PmergeMe::_isGreaterMerge(T lv, T rv)
 {
 	nbCompMerge++;
 	return lv > rv;
 }
 
 template <typename T>
-bool PmergeMe::_isOngoingBissect(T start, T end)
+bool	PmergeMe::_isOngoingBissect(T start, T end)
 {
 	return start < end;
 }
 
 template <typename T>
-bool PmergeMe::_isMidTooLowInsert(T found, T target)
+bool	PmergeMe::_isLowerInsert(T found, T target)
 {
 	nbCompInsert++;
 	return found < target;
+}
+
+template <typename T>
+bool	PmergeMe::_isEqualInsert(T found, T target)
+{
+	nbCompInsert++;
+	return found == target;
+}
+
+template <typename T>
+bool	PmergeMe::_isUpperInsert(T lv, T rv)
+{
+	nbCompInsert++;
+	return lv > rv;
+}
+
+
+template <typename T>
+bool	PmergeMe::_isBeyondLast(T startIdx, T endIdx)
+{
+	nbCompInsert++;
+	return startIdx > endIdx;
 }

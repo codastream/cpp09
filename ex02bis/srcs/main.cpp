@@ -21,18 +21,20 @@ static bool	checkArgs(int ac, char **av)
 	return true;
 }
 
-/// @brief compute the theoretical worst case scenario in terms of nb of comparisons
+/// @brief compute the theoretical min nb of comparisons, which is ceil(log2(n!))
+/// 	which with Stirling's approximation is around n log2 n − 1.44 n + O(log n)
 /// @param n number of elements to be sorted
 /// @return aggregated number of comparisons
-static int	computeMaxComparisons(size_t n)
+static int	computeMinComparisons(size_t n)
 {
-	int sum = 0;
-	for (size_t k = 1; k <= n; ++k)
+	if (n <= 1)
+		return 0;
+	long double sumLog2 = 0.0L;
+	for (size_t k = 2; k <= n; ++k)
 	{
-		double value = (3.0 / 4.0) * k;
-		sum += static_cast<int>(std::ceil(log2(value)));
+		sumLog2 += log2(static_cast<long double>(k));
 	}
-	return sum;
+	return static_cast<int>(std::ceil(sumLog2));
 }
 
 static bool	isSortedAsc(t_vec& v)
@@ -80,7 +82,7 @@ int	main(int ac, char** av)
 	printData("sorted:\t\t", &(miVec.vec), 0, 1);
 
 	printTitle(CYAN, "Expected complexity");
-	std::cout << BLUE << "theoretical worst case = O (n log2(n) + sum(3/4n))\t" << NC << computeMaxComparisons(n) << std::endl;
+	std::cout << BLUE << "theoretical min\t" << NC << computeMinComparisons(n) << std::endl;
 
 	printTitle(CYAN, "Nb of comparisons");
 	std::cout << BLUE << "merge\t" << NC << miVec.nbCompMerge << std::endl;

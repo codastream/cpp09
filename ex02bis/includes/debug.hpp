@@ -7,11 +7,12 @@
 #include <iostream>
 #include <string>
 #include <iomanip>
+#include <cmath>
 
 bool	isLastNbOfElem(size_t i, size_t elemSize);
 bool	isFirstNbOfPair(size_t i, size_t elemSize);
 bool	isLastNbOfPair(size_t i, size_t elemSize);
-bool	isOdd(size_t i, size_t elemSize, size_t dataSize, size_t nbElems);
+bool	isOdd(size_t i, size_t elemSize, size_t dataSize);
 bool	isLastNbOfOdd(size_t i, size_t elemSize, size_t dataSize, size_t nbElems);
 
 void	printDepthOffset(int depth);
