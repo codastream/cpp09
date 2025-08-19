@@ -280,13 +280,12 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 			if (DEB)
 			{
 				printData(BLUE "main:\t", &main, depth, elemSize);
-				std::cout << "wanting ti insert elem at index " << fromIndex << " = " << toInsert << " into main a index " << insertOffset << std::endl;
+				std::cout << "wanting to insert elem at index " << fromIndex << " = " << toInsert << " into main a index " << insertOffset << std::endl;
 			}
 			insertElemAtPos(main, data, elemSize, fromIndex, insertOffset);
 			i -= pairSize;
 			--pendingNb;
 			--batchSize;
-			std::cout << "pendingNb = " << pendingNb << std::endl;
 		}
 		++k;
 		if (k > _jacobLen)
@@ -304,7 +303,6 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 		i = getIndexOfLastNb((tk - 1), elemSize);
 	else
 		i = getIndexOfLastNb(2, elemSize);
-	std::cout << "tk=" << tk << "i= " << i << std::endl;
 
 	while (pendingNb > 0)
 	{
