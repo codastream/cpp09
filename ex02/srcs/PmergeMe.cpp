@@ -255,8 +255,6 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 	t_vec					main;
 	size_t					dataSize = data->size();
 	size_t					nbElems = dataSize / elemSize;
-	if (dataSize % 2 == 1 && elemSize == 1)
-		++nbElems;
 	size_t					pairSize = elemSize * 2;
 	fillMain(main, data, elemSize, nbElems);
 
@@ -266,11 +264,14 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 	size_t					tk = _jacob[k];
 	size_t					batchSize = tk - _jacob[k - 1];
 	size_t					dataSizeMinusOddAndFirstPair = dataSize - (dataSize % elemSize) - (elemSize * 2);
-	size_t					pendingNb = dataSizeMinusOddAndFirstPair % (elemSize * 2) == 0 ? dataSizeMinusOddAndFirstPair / (elemSize * 2) : dataSizeMinusOddAndFirstPair / (elemSize * 2) + 1;
+	size_t					pendingNb = dataSizeMinusOddAndFirstPair / (elemSize * 2);
+	if (dataSizeMinusOddAndFirstPair % (elemSize * 2) != 0)
+		pendingNb += 1;
 	size_t					i;
 	int						toInsert;
 	size_t					insertOffset;
 	size_t					fromIndex;
+	size_t					prevI;
 
 	#ifdef DEBUG
 	if (batchSize <= pendingNb)
@@ -278,14 +279,21 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 	#endif
 	if (DEB)
 	{
-		std::cout << "dataSizeMinusOddAndFirstPair=" << dataSizeMinusOddAndFirstPair << std::endl;
 		std::cout << "nbElems=" << nbElems << std::endl;
-		std::cout << "pendingNb=" << pendingNb << std::endl;
+		std::cout << BG_BLUE << "dataSizeMinusOddAndFirstPair=" << dataSizeMinusOddAndFirstPair << std::endl;
+		std::cout << "pendingNb=" << pendingNb << NC << std::endl;
 		std::cout << "batchSize=" << batchSize << std::endl;
 	}
 	while (batchSize <= pendingNb)
 	{
 		i = getIndexOfLastNb((tk - 1) * 2, elemSize);
+		prevI = i;
+		if (DEB)
+		{
+			std::cout << "k= " << tk << "\n";
+			std::cout << "tk= " << tk << "\n";
+			std::cout << "i= " << i << "\n";
+		}
 		#ifdef DEBUG
 		printByPairWithPending("batch:\t", data, depth, elemSize, i, batchSize);
 		#endif
@@ -308,7 +316,7 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 		if (k > _jacobLen)
 			throw std::out_of_range("trying to reach beyond registered elems of Jacobstahl sequence");
 		tk = _jacob[k];
-		batchSize = tk - _jacob[k - 1];
+		batchSize = tk -_jacob[k - 1];
 	}
 
 	#ifdef DEBUG
@@ -317,7 +325,7 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 		printColor(PURPLE, "Inserting remaining elements");
 	#endif
 	if (k > 3)
-		i = _jacob[k - 1] * elemSize + (elemSize * 2) + elemSize - 1;
+		i = prevI + (elemSize * 2);
 	else
 		i = getIndexOfLastNb(2, elemSize);
 	if (DEB)
@@ -350,6 +358,9 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 	}
 	#endif
 	size_t oddNb = dataSize - (nbElems * elemSize);
+	std::cout << "dataSize = " << dataSize << "\n";
+	std::cout << "nbElems = " << nbElems << "\n";
+	std::cout << "oddnb = " << oddNb << "\n";
 	for (size_t i = oddNb; i > 0; --i)
 	{
 		main.push_back((*data)[dataSize - i]);
