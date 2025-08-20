@@ -45,15 +45,27 @@ PmergeMe& PmergeMe::operator=(const PmergeMe& other)
 *					🛠️ STATIC FUNCTIONS						*
 ***************************************************************/
 
-static size_t getIndexOfLastNb(size_t elemIndex, size_t elemSize)
+static bool	isSortedAsc(t_vec& v, size_t elemSize)
 {
-	size_t res = (elemIndex + 1) * elemSize - 1;
-	return res;
+	if (v.size() < 2)
+		return true;
+	for (t_vec::const_iterator it = v.begin() + elemSize + elemSize - 1; it != v.end(); it += elemSize)
+	{
+		if (*it < *(it - elemSize))
+			return false;
+	}
+	return true;
 }
+
+// static size_t getIndexOfLastNb(size_t elemIndex, size_t elemSize)
+// {
+// 	size_t res = (elemIndex + 1) * elemSize - 1;
+// 	return res;
+// }
 
 static void	insertElemAtBack(t_vec& main, t_vec& data, size_t elemSize, size_t fromIndex)
 {
-	for (size_t i = 0; i < elemSize && data[fromIndex]; ++i, ++fromIndex)
+	for (size_t i = 0; i < elemSize ; ++i, ++fromIndex)
 	{
 		if (DEB)
 		{
@@ -89,6 +101,7 @@ static void	fillMain(t_vec& main, t_vec* data, size_t elemSize, size_t nbElem)
 	#ifdef DEBUG
 	printData(BLUE "main:\t", &main, 0, elemSize);
 	std::cout << PURPLE << "Adding A1..n (max elems of sorted pair)" << NC << std::endl;
+	std::cout << elemSize << "\n";
 	#endif
 	for (size_t i = elemSize; i <= dataSize - elemSize; i += pairSize)
 	{
@@ -271,7 +284,7 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 	int						toInsert;
 	size_t					insertOffset;
 	size_t					fromIndex;
-	size_t					prevI;
+	size_t					prevI = elemSize - 1;
 
 	#ifdef DEBUG
 	if (batchSize <= pendingNb)
@@ -286,13 +299,14 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 	}
 	while (batchSize <= pendingNb)
 	{
-		i = getIndexOfLastNb((tk - 1) * 2, elemSize);
+		i = prevI + (elemSize * 2);
 		prevI = i;
 		if (DEB)
 		{
-			std::cout << "k= " << tk << "\n";
+			std::cout << "k= " << k << "\n";
 			std::cout << "tk= " << tk << "\n";
-			std::cout << "i= " << i << "\n";
+			std::cout << "pendingNb=" << pendingNb << NC << std::endl;
+			std::cout << "batchSize=" << batchSize << std::endl;
 		}
 		#ifdef DEBUG
 		printByPairWithPending("batch:\t", data, depth, elemSize, i, batchSize);
@@ -308,6 +322,10 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 				std::cout << "wanting to insert elem at index " << fromIndex << " = " << toInsert << " into main a index " << insertOffset << std::endl;
 			}
 			insertElemAtPos(main, data, elemSize, fromIndex, insertOffset);
+			if (!isSortedAsc(main, elemSize))
+			{
+				std::cout << BG_RED << "not sorted !!!!" << std::endl;
+			}
 			i -= pairSize;
 			--pendingNb;
 			--batchSize;
@@ -324,10 +342,9 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 	if (pendingNb > 0)
 		printColor(PURPLE, "Inserting remaining elements");
 	#endif
-	if (k > 3)
-		i = prevI + (elemSize * 2);
-	else
-		i = getIndexOfLastNb(2, elemSize);
+	i = prevI + (elemSize * 2);
+	// else
+	// 	i = getIndexOfLastNb(2, elemSize);
 	if (DEB)
 	{
 		std::cout << "k=" << k << std::endl;

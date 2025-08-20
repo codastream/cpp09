@@ -73,7 +73,10 @@ int	main(int ac, char** av)
 
 	#ifdef DEBUG
 	if (!isSortedAsc(miVec.vec) || miVec.vec.size() != static_cast<unsigned long>(n))
+	{
 		std::cout << RED << "not sorted !" << NC << std::endl;
+		std::cout << "input of size " << n << " and sorted of size " << miVec.vec.size() << std::endl;
+	}
 	else
 		std::cout << GREEN << "sorted !" << NC << std::endl;
 	#else
