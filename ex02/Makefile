@@ -1,12 +1,13 @@
 NAME		:=	PmergeMe
 
 SRCS_FILES:=	main.cpp\
-				util.cpp\
+				utils.cpp\
+				debug.cpp\
 				PmergeMe.cpp\
 
 include ../ex00/common.mk
 
-printstep: CXXFLAGS += -DPRINTSTEP=1
-printstep: clean all
+debug: CXXFLAGS += -g -DDEBUG=1
+debug: clean all
 
-.PHONY: all clean fclean re $(DIRS) printstep
+.PHONY: all clean fclean re $(DIRS) debug
