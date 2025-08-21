@@ -36,16 +36,87 @@ static int	computeMinComparisons(size_t n)
 	return static_cast<int>(std::ceil(sumLog2));
 }
 
-static bool	isSortedAsc(t_vec& v)
+void	checkVector(PmergeMe& mi, int n)
 {
-	if (v.size() < 2)
-		return true;
-	for (t_vec::const_iterator it = v.begin() + 1; it != v.end(); ++it)
+	printTitle(BG_CYAN, "vector");
+	printTitle(CYAN, "Before");
+	printData("data:\t", &(mi.vec), 0, 1);
+	mi.sort(&(mi.vec));
+	#ifdef DEBUG
+	if (!isSortedAsc(mi.vec, 1) || mi.vec.size() != static_cast<unsigned long>(n))
 	{
-		if (*it < *(it - 1))
-			return false;
+		std::cout << RED << "not sorted !" << NC << std::endl;
+		std::cout << "input of size " << n << " and sorted of size " << mi.vec.size() << std::endl;
 	}
-	return true;
+	else
+		std::cout << GREEN << "sorted !" << NC << std::endl;
+	#else
+	// (void) isSortedAsc<std::vector<int> >;
+	(void) computeMinComparisons;
+	#endif
+
+	printTitle(CYAN, "After");
+	printData("sorted:\t", &(mi.vec), 0, 1);
+
+	#ifdef DEBUG
+	printTitle(CYAN, "Expected theoretical complexity if n <= 12");
+	std::cout << BLUE << "theoretical min\t" << NC << computeMinComparisons(n) << std::endl;
+
+	printTitle(CYAN, "Nb of comparisons");
+	std::cout << BLUE << "merge\t" << NC << mi.nbCompMerge << std::endl;
+	std::cout << BLUE << "insert\t" << NC << mi.nbCompInsert << std::endl;
+	std::cout << B_BLUE << "total\t" << NC << mi.nbCompMerge + mi.nbCompInsert << std::endl;
+	#endif
+
+	std::ostringstream oss;
+	std::string msg;
+	oss << "Time to process a range of " << n << " with std::vector";
+	msg = oss.str();
+	printTitleCompute(CYAN, msg);
+	std::cout << BLUE << "merge\t" << NC << std::fixed << std::setprecision(5) << mi.timeToMerge << " µsec" << std::endl;
+	std::cout << BLUE << "insert\t" << NC << std::fixed << std::setprecision(5) << mi.timeToInsert << " µsec" << std::endl;
+	std::cout << B_BLUE << "total\t" << NC << std::fixed << std::setprecision(5) << mi.timeToMerge + mi.timeToInsert << " µsec" << std::endl;
+}
+
+void	checkList(PmergeMe& mi, int n)
+{
+	printTitle(BG_CYAN, "list");
+	printTitle(CYAN, "Before");
+	printData("data:\t", &(mi.list), 0, 1);
+	mi.sort(&(mi.list));
+	#ifdef DEBUG
+	if (!isSortedAsc(mi.list, 1) || mi.list.size() != static_cast<unsigned long>(n))
+	{
+		std::cout << RED << "not sorted !" << NC << std::endl;
+		std::cout << "input of size " << n << " and sorted of size " << mi.list.size() << std::endl;
+	}
+	else
+		std::cout << GREEN << "sorted !" << NC << std::endl;
+	#else
+	(void) computeMinComparisons;
+	#endif
+
+	printTitle(CYAN, "After");
+	printData("sorted:\t", &(mi.list), 0, 1);
+
+	#ifdef DEBUG
+	printTitle(CYAN, "Expected theoretical complexity if n <= 12");
+	std::cout << BLUE << "theoretical min\t" << NC << computeMinComparisons(n) << std::endl;
+
+	printTitle(CYAN, "Nb of comparisons");
+	std::cout << BLUE << "merge\t" << NC << mi.nbCompMerge << std::endl;
+	std::cout << BLUE << "insert\t" << NC << mi.nbCompInsert << std::endl;
+	std::cout << B_BLUE << "total\t" << NC << mi.nbCompMerge + mi.nbCompInsert << std::endl;
+	#endif
+
+	std::ostringstream oss;
+	std::string msg;
+	oss << "Time to process a range of " << n << " with std::vector";
+	msg = oss.str();
+	printTitleCompute(CYAN, msg);
+	std::cout << BLUE << "merge\t" << NC << std::fixed << std::setprecision(5) << mi.timeToMerge << " µsec" << std::endl;
+	std::cout << BLUE << "insert\t" << NC << std::fixed << std::setprecision(5) << mi.timeToInsert << " µsec" << std::endl;
+	std::cout << B_BLUE << "total\t" << NC << std::fixed << std::setprecision(5) << mi.timeToMerge + mi.timeToInsert << " µsec" << std::endl;
 }
 
 int	main(int ac, char** av)
@@ -56,53 +127,15 @@ int	main(int ac, char** av)
 		return 1;
 	}
 
-	PmergeMe	miVec;
+	PmergeMe	mi;
 	int			n = --ac;
 
 	printTitle(BG_BLUE, "RESULTS");
 	printTitle(BLUE, "Input size (n)");
 	std::cout << n << std::endl;
 
-	printTitle(BG_CYAN, "vector");
+	mi.initContainers(n, ++av);
 
-	printTitle(CYAN, "Before");
-	miVec.initVec(n, ++av);
-	printData("data:\t", &(miVec.vec), 0, 1);
-
-	miVec.sort(&(miVec.vec));
-
-	#ifdef DEBUG
-	if (!isSortedAsc(miVec.vec) || miVec.vec.size() != static_cast<unsigned long>(n))
-	{
-		std::cout << RED << "not sorted !" << NC << std::endl;
-		std::cout << "input of size " << n << " and sorted of size " << miVec.vec.size() << std::endl;
-	}
-	else
-		std::cout << GREEN << "sorted !" << NC << std::endl;
-	#else
-	(void) isSortedAsc;
-	(void) computeMinComparisons;
-	#endif
-
-	printTitle(CYAN, "After");
-	printData("sorted:\t", &(miVec.vec), 0, 1);
-
-	#ifdef DEBUG
-	printTitle(CYAN, "Expected theoretical complexity if n <= 12");
-	std::cout << BLUE << "theoretical min\t" << NC << computeMinComparisons(n) << std::endl;
-
-	printTitle(CYAN, "Nb of comparisons");
-	std::cout << BLUE << "merge\t" << NC << miVec.nbCompMerge << std::endl;
-	std::cout << BLUE << "insert\t" << NC << miVec.nbCompInsert << std::endl;
-	std::cout << B_BLUE << "total\t" << NC << miVec.nbCompMerge + miVec.nbCompInsert << std::endl;
-	#endif
-
-	std::ostringstream oss;
-	std::string msg;
-	oss << "Time to process a range of " << n << " with std::vector";
-	msg = oss.str();
-	printTitleCompute(CYAN, msg);
-	std::cout << BLUE << "merge\t" << NC << std::fixed << std::setprecision(5) << miVec.timeToMerge << " µsec" << std::endl;
-	std::cout << BLUE << "insert\t" << NC << std::fixed << std::setprecision(5) << miVec.timeToInsert << " µsec" << std::endl;
-	std::cout << B_BLUE << "total\t" << NC << std::fixed << std::setprecision(5) << miVec.timeToMerge + miVec.timeToInsert << " µsec" << std::endl;
+	// checkVector(mi, n);
+	checkList(mi, n);
 }

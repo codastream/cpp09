@@ -21,6 +21,9 @@ bool	isPartOfBatch(size_t i, size_t elemSize, size_t batchEndIdx, size_t batchSi
 void	printDepthOffset(int depth);
 
 template <typename C>
+bool	isSortedAsc(const C& cont, size_t elemSize);
+
+template <typename C>
 void	printByPairWithPending(const std::string& msgCol, const C* data, int depth, size_t elemSize, size_t batchSEndIdx, size_t batchSize, bool showMax = false);
 
 template <typename C>
@@ -28,8 +31,6 @@ void	printByPair(const std::string& msgCol, const C* data, int depth, size_t ele
 
 template <typename C>
 void	printData(const std::string& msgCol, const C* data, int depth, size_t elemSize, bool showMax = false);
-
-
 
 #include "debug.tpp"
 

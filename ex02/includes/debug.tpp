@@ -1,4 +1,21 @@
 template <typename C>
+bool	isSortedAsc(const C& cont, size_t elemSize)
+{
+	if (cont.size() < 2)
+		return true;
+	typename C::const_iterator it = cont.begin();
+	typename C::const_iterator previt = cont.begin();
+	std::advance(it, elemSize + elemSize - 1);
+	std::advance(previt, elemSize - 1);
+	for (; it != cont.end(); std::advance(previt, elemSize), std::advance(it, elemSize))
+	{
+		if (*it < *previt)
+			return false;
+	}
+	return true;
+}
+
+template <typename C>
 void	printByPair(const std::string& msgCol, const C* data, int depth, size_t elemSize, bool showMax)
 {
 	(void) depth;

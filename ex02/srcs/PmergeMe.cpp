@@ -45,24 +45,6 @@ PmergeMe& PmergeMe::operator=(const PmergeMe& other)
 *					🛠️ STATIC FUNCTIONS						*
 ***************************************************************/
 
-static bool	isSortedAsc(t_vec& v, size_t elemSize)
-{
-	if (v.size() < 2)
-		return true;
-	for (t_vec::const_iterator it = v.begin() + elemSize + elemSize - 1; it != v.end(); it += elemSize)
-	{
-		if (*it < *(it - elemSize))
-			return false;
-	}
-	return true;
-}
-
-// static size_t getIndexOfLastNb(size_t elemIndex, size_t elemSize)
-// {
-// 	size_t res = (elemIndex + 1) * elemSize - 1;
-// 	return res;
-// }
-
 static void	insertElemAtBack(t_vec& main, t_vec& data, size_t elemSize, size_t fromIndex)
 {
 	for (size_t i = 0; i < elemSize ; ++i, ++fromIndex)
@@ -81,6 +63,26 @@ static void insertElemAtPos(t_vec& main, t_vec* data, size_t elemSize, size_t fr
 	{
 		main.insert(main.begin() + insertOffset + i, (*data)[fromIndex]);
 	}
+}
+
+static void	insertElemAtBack(t_list& main, t_list& data, size_t elemSize, size_t fromIndex)
+{
+	t_list::iterator it = data.begin();
+	std::advance(it, fromIndex);
+	t_list::iterator endit = data.begin();
+	std::advance(it, elemSize);
+	std::copy(it, endit, std::back_inserter(main));
+}
+
+static void insertElemAtPos(t_list& main, t_list* data, size_t elemSize, size_t fromIndex, size_t insertOffset)
+{
+	t_list::iterator it = data->begin();
+	std::advance(it, fromIndex);
+	t_list::iterator endit = data->begin();
+	std::advance(endit, fromIndex + elemSize);
+	t_list::iterator insit = main.begin();
+	std::advance(insit, insertOffset);
+	std::copy(it, endit, std::inserter(main, insit));
 }
 
 /// @brief generate sorted container main (aka S) made of first elem of mins (aka B) and all elems of maxs (aka A)
@@ -112,6 +114,39 @@ static void	fillMain(t_vec& main, t_vec* data, size_t elemSize, size_t nbElem)
 	#endif
 }
 
+/// @brief generate sorted container main (aka S) made of first elem of mins (aka B) and all elems of maxs (aka A)
+/// @param main 
+/// @param data 
+/// @param elemSize 
+static void	fillMain(t_list& main, t_list* data, size_t elemSize)
+{
+	size_t	dataSize = data->size();
+	size_t	pairSize = elemSize * 2;
+	
+	#ifdef DEBUG
+	std::cout << PURPLE << "\nFilling main....\n" << NC;
+	std::cout << PURPLE << "Adding B1 (min elem of first sorted pair)" << NC << std::endl;
+	#endif
+	insertElemAtBack(main, *data, elemSize, 0);
+	#ifdef DEBUG
+	printData(BLUE "main:\t", &main, 0, elemSize);
+	std::cout << PURPLE << "Adding A1..n (max elems of sorted pair)" << NC << std::endl;
+	std::cout << elemSize << "\n";
+	#endif
+	for (size_t i = elemSize; i <= dataSize - elemSize; i += pairSize)
+	{
+		insertElemAtBack(main, *data, elemSize, i);
+	}
+	#ifdef DEBUG
+	printData(BLUE "main:\t", &main, 0, elemSize);
+	#endif
+}
+
+/// @brief used for binary search to be sure that the index is that of lead value in elem
+/// @param vSize container size
+/// @param elemSize 
+/// @param idx 
+/// @return aligned index
 static size_t alignToRightmost(size_t vSize, size_t elemSize, size_t idx)
 {
 	size_t	aligned = idx - (idx % elemSize) + (elemSize - 1);
@@ -124,7 +159,7 @@ static size_t alignToRightmost(size_t vSize, size_t elemSize, size_t idx)
 *					📁 MEMBER FUNCTIONS						*
 ***************************************************************/
 
-void	PmergeMe::initVec(int ac, char **av)
+void	PmergeMe::initContainers(int ac, char **av)
 {
 	int		val;
 	char	*end;
@@ -133,6 +168,7 @@ void	PmergeMe::initVec(int ac, char **av)
 	{
 		val = static_cast<int>(std::strtol(av[i], &end, 10));
 		vec.push_back(val);
+		list.push_back(val);
 	}
 }
 
@@ -221,6 +257,103 @@ size_t	PmergeMe::_binarySearch(t_vec& main, size_t ostart, size_t oend, int val,
 	return insertIdx;
 }
 
+int	PmergeMe::_getValAtIndexInsert(t_list& l, size_t index)
+{
+	std::list<int>::iterator	it = l.begin();
+	std::advance(it, index);
+	this->nbCompInsert += index;
+	return (*it);
+}
+
+int	PmergeMe::_getValAtIndexInsertOffset(t_list* l, size_t startIndex, int offset)
+{
+	std::list<int>::iterator	it = l->begin();
+	std::advance(it, startIndex);
+	this->nbCompInsert += offset;
+	return (*it);
+}
+
+
+/// @brief binary search of lower insertion point for target val
+/// @param main container to search in
+/// @param ostart lower bound index
+/// @param oend upper bound index
+/// @param val target value
+/// @param elemSize number of int in one elem
+/// @return index ajusted to 0 or main.size in edge cases
+size_t	PmergeMe::_binarySearch(t_list& main, size_t ostart, size_t oend, int val, size_t elemSize)
+{
+	const size_t	n = main.size();
+	int				start;
+	int				end;
+	size_t			span;
+	size_t			mid;
+	size_t			rightMostIdx;
+	size_t			leftMostIdx;
+	size_t			insertIdx;
+	int				midVal;
+	int				rightMostVal;
+
+	if (n == 0 || elemSize == 0 || ostart > oend)
+		return 0;
+	if (oend >= n)
+		end = n - 1;
+	start = alignToRightmost(main.size(), elemSize, ostart);
+	end = alignToRightmost(main.size(), elemSize, oend);
+
+	if (DEB)
+	{
+		printByPair(GREY "search:\t", &main, 0, elemSize);
+		std::cout << "bin search between start = " << start << " and end = " << end << NC << "\n";
+	}
+	while (_isOngoingBissect(start, end))
+	{
+		span = (end - start) / elemSize;
+		mid = start + (span / 2 * elemSize);
+		midVal = _getValAtIndexInsert(main, mid);
+		if (_isLowerInsert(midVal, val))
+		{
+			if (DEB)
+			{
+				std::cout << midVal << RED << " < " << CYAN << val << NC << " ... incrementing start to " << mid + elemSize << NC << "\n";
+			}
+			start = mid + elemSize;
+			if (start > end)
+				start = end;
+		}
+		else
+		{
+			if (DEB)
+			{
+				std::cout << midVal << BLUE << " >= " << CYAN << val << NC << " ... decrementing end to " << mid - elemSize << NC << "\n";
+			}
+			end = mid - elemSize;
+			if (end < 0)
+				end = 0;
+		}
+	}
+	rightMostIdx = start;
+	leftMostIdx = rightMostIdx - (elemSize - 1);
+	rightMostVal = _getValAtIndexInsert(main, rightMostIdx);
+	if (_isUpperInsert(rightMostVal, val))
+	{
+		if (DEB)
+		{
+			std::cout << "checking main[rightmost]=" << rightMostVal << BLUE << " > " << CYAN << val << NC << " ... setting insert idx to leftmost = " << leftMostIdx << NC << "\n";
+		}
+		insertIdx = leftMostIdx;
+	}
+	else
+	{
+		if (DEB)
+		{
+			std::cout << "checking main[rightmost]=" << rightMostVal << RED << " <= " << CYAN << val << NC << " ... setting insert idx to rightmost + 1 = " << rightMostIdx + 1 << NC << "\n";
+		}
+		insertIdx = rightMostIdx + 1;
+	}
+	return insertIdx;
+}
+
 /// @brief creates pairs (min, max)
 /// @param data container containing pairs and possibly extra odd values
 /// @param elemSize number of int in one elem
@@ -246,6 +379,44 @@ void	PmergeMe::_merge(t_vec* data, size_t elemSize, int depth)
 			t_vec::iterator maxStart = data->begin() + i;
 			t_vec::iterator maxEnd = data->begin() + i + elemSize;
 			t_vec::iterator minStart = data->begin() + i + elemSize;
+			std::swap_ranges(maxStart, maxEnd, minStart);
+		}
+	}
+	#ifdef DEBUG
+	printByPair(BLUE "after:\t", data, depth, elemSize, true);
+	#endif
+}
+
+/// @brief creates pairs (min, max)
+/// @param data container containing pairs and possibly extra odd values
+/// @param elemSize number of int in one elem
+void	PmergeMe::_merge(t_list* data, size_t elemSize, int depth)
+{
+	#ifdef DEBUG
+	printTitle(BG_PURPLE, "Merge");
+	printByPair(BLUE "before:\t", data, depth, elemSize);
+	#else
+	(void) depth;
+	#endif
+	size_t	pairSize = elemSize * 2;
+	size_t	dataSize = data->size();
+
+	if (data->size() < pairSize)
+		return ;
+	for (size_t i = 0; i + pairSize <= dataSize; i += pairSize)
+	{
+		t_list::iterator itFirst = data->begin();
+		std::advance(itFirst, i + elemSize - 1);
+		t_list::iterator itSecond = data->begin();
+		std::advance(itSecond, i + elemSize + elemSize - 1);
+		if (_isGreaterMerge(*itFirst, *itSecond))
+		{
+			t_list::iterator maxStart = data->begin();
+			std::advance(maxStart, i);
+			t_list::iterator maxEnd = data->begin();
+			std::advance(maxEnd, i + elemSize);
+			t_list::iterator minStart = data->begin();
+			std::advance(minStart, i + elemSize);
 			std::swap_ranges(maxStart, maxEnd, minStart);
 		}
 	}
@@ -342,6 +513,150 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 	if (pendingNb > 0)
 		printColor(PURPLE, "Inserting remaining elements");
 	#endif
+	i = prevI + (pairSize);
+	if (DEB)
+	{
+		std::cout << "k=" << k << std::endl;
+		std::cout << "tk=" << tk << std::endl;
+		std::cout << "i=" << i << std::endl;
+		std::cout << "pendingNb=" << pendingNb << std::endl;
+	}
+	while (pendingNb > 0)
+	{
+		toInsert = (*data)[i];
+		insertOffset = _binarySearch(main, elemSize - 1, main.size() - 1, toInsert, elemSize);
+		fromIndex = i - elemSize + 1;
+		if (DEB)
+		{
+			printData(BLUE "main:\t", &main, depth, elemSize);
+			std::cout << "wanting to insert elem at index " << fromIndex << " = " << toInsert << " into main a index " << insertOffset << std::endl;
+		}
+		insertElemAtPos(main, data, elemSize, fromIndex, insertOffset);
+		this->nbCompInsert += insertOffset;
+		--pendingNb;
+		i += pairSize;
+	}
+
+	#ifdef DEBUG
+	printData(BLUE "main:\t", &main, depth, elemSize);
+	if (elemSize != 1 && data->size() % 2 == 1)
+	{
+		printColor(PURPLE, "Adding odd numbers");
+	}
+	#endif
+	size_t oddNb = dataSize - (nbElems * elemSize);
+	if (DEB)
+	{
+		std::cout << "dataSize = " << dataSize << "\n";
+		std::cout << "nbElems = " << nbElems << "\n";
+		std::cout << "oddnb = " << oddNb << "\n";
+	}
+	for (size_t i = oddNb; i > 0; --i)
+	{
+		main.push_back((*data)[dataSize - i]);
+	}		
+	*data = main;
+	#ifdef DEBUG
+	printData(GREEN "sorted:\t", &main, depth, elemSize);
+	#endif
+}
+
+/// =============================================================================
+///	LIST
+/// =============================================================================
+
+
+/// @brief binary inserts pending + odd elems into main, first by bounding with Jacobstahl sequence, then for all the surface of main
+/// @param data 
+/// @param elemSize 
+void	PmergeMe::_insert(t_list* data, size_t elemSize, int depth)
+{
+	#ifdef DEBUG
+	printTitle(BG_PURPLE, "Insert");
+	printByPair(BLUE "data:\t", data, depth, elemSize);
+	#else
+	(void) depth;
+	#endif
+	t_list					main;
+	size_t					dataSize = data->size();
+	size_t					nbElems = dataSize / elemSize;
+	size_t					pairSize = elemSize * 2;
+	fillMain(main, data, elemSize);
+
+	(void) depth;
+
+	size_t					k = 3;
+	size_t					tk = _jacob[k];
+	size_t					batchSize = tk - _jacob[k - 1];
+	size_t					dataSizeMinusOddAndFirstPair = dataSize - (dataSize % elemSize) - (elemSize * 2);
+	size_t					pendingNb = dataSizeMinusOddAndFirstPair / (elemSize * 2);
+	if (dataSizeMinusOddAndFirstPair % (elemSize * 2) != 0)
+		pendingNb += 1;
+	size_t					i;
+	int						toInsert;
+	size_t					insertOffset;
+	size_t					fromIndex;
+	size_t					prevI = elemSize - 1;
+
+	#ifdef DEBUG
+	if (batchSize <= pendingNb)
+		printColor(PURPLE, "Using Jacostahl sequence");
+	#endif
+	if (DEB)
+	{
+		std::cout << "nbElems=" << nbElems << std::endl;
+		std::cout << BG_BLUE << "dataSizeMinusOddAndFirstPair=" << dataSizeMinusOddAndFirstPair << std::endl;
+		std::cout << "pendingNb=" << pendingNb << NC << std::endl;
+		std::cout << "batchSize=" << batchSize << std::endl;
+	}
+	while (batchSize <= pendingNb)
+	{
+		i = prevI + (elemSize * 2);
+		prevI = i;
+		if (DEB)
+		{
+			std::cout << "k= " << k << "\n";
+			std::cout << "tk= " << tk << "\n";
+			std::cout << "pendingNb=" << pendingNb << NC << std::endl;
+			std::cout << "batchSize=" << batchSize << std::endl;
+		}
+		#ifdef DEBUG
+		printByPairWithPending("batch:\t", data, depth, elemSize, i, batchSize);
+		#endif
+		while (batchSize > 0 && i < data->size())
+		{
+			if (i == prevI)
+				toInsert = _getValAtIndexInsert(*data, i);
+			else
+				toInsert = _getValAtIndexInsertOffset(data, i, -pairSize);
+			insertOffset = _binarySearch(main, elemSize - 1, (tk + 1) * elemSize, toInsert, elemSize);
+			fromIndex = i - elemSize + 1;
+			if (DEB)
+			{
+				printData(BLUE "main:\t", &main, depth, elemSize);
+				std::cout << "wanting to insert elem at index " << fromIndex << " = " << toInsert << " into main a index " << insertOffset << std::endl;
+			}
+			insertElemAtPos(main, data, elemSize, fromIndex, insertOffset);
+			if (!isSortedAsc(main, elemSize))
+			{
+				std::cout << BG_RED << "not sorted !!!!" << std::endl;
+			}
+			i -= pairSize;
+			--pendingNb;
+			--batchSize;
+		}
+		++k;
+		if (k > _jacobLen)
+			throw std::out_of_range("trying to reach beyond registered elems of Jacobstahl sequence");
+		tk = _jacob[k];
+		batchSize = tk -_jacob[k - 1];
+	}
+
+	#ifdef DEBUG
+	printData(BLUE "main:\t", &main, depth, elemSize);
+	if (pendingNb > 0)
+		printColor(PURPLE, "Inserting remaining elements");
+	#endif
 	i = prevI + (elemSize * 2);
 	// else
 	// 	i = getIndexOfLastNb(2, elemSize);
@@ -354,7 +669,10 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 	}
 	while (pendingNb > 0)
 	{
-		toInsert = (*data)[i];
+		if (i == prevI + pairSize)
+			toInsert = _getValAtIndexInsertOffset(data, prevI, pairSize);
+		else
+			toInsert = _getValAtIndexInsertOffset(data, i, pairSize);
 		insertOffset = _binarySearch(main, elemSize - 1, main.size() - 1, toInsert, elemSize);
 		fromIndex = i - elemSize + 1;
 		if (DEB)
@@ -375,13 +693,23 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 	}
 	#endif
 	size_t oddNb = dataSize - (nbElems * elemSize);
-	std::cout << "dataSize = " << dataSize << "\n";
-	std::cout << "nbElems = " << nbElems << "\n";
-	std::cout << "oddnb = " << oddNb << "\n";
+	if (oddNb > 0)
+		this->nbCompInsert += oddNb - 1;
+	if (DEB)
+	{
+		std::cout << "dataSize = " << dataSize << "\n";
+		std::cout << "nbElems = " << nbElems << "\n";
+		std::cout << "oddnb = " << oddNb << "\n";
+	}
+	int val;
+	t_list::reverse_iterator rit = data->rbegin();
 	for (size_t i = oddNb; i > 0; --i)
 	{
-		main.push_back((*data)[dataSize - i]);
-	}		
+		std::advance(rit, i);
+		val = *rit;
+		main.push_back(val);
+	}
+
 	*data = main;
 	#ifdef DEBUG
 	printData(GREEN "sorted:\t", &main, depth, elemSize);
