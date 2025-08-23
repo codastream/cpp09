@@ -140,5 +140,5 @@ int	main(int ac, char** av)
 	miL.initContainers(n, ++argcp);
 
 	checkVector(miV, n);
-	checkList(miL, n);
+	// checkList(miL, n);
 }

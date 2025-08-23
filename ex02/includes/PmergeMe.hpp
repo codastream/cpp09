@@ -57,7 +57,7 @@ class PmergeMe {
 		t_vec					_jacob;
 
 		size_t 					_computeBatchSize(size_t n);
-		size_t					_binarySearch(t_vec& main, size_t start, size_t end, int val, size_t elemSize);
+		size_t					_binarySearch(t_vec& main, size_t start, size_t end, int val, size_t elemSize, bool isMainSize);
 		size_t					_binarySearch(t_list& main, size_t start, size_t end, int val, size_t elemSize);
 		
 		int						_getValAtIndexInsert(t_list& l, size_t index);

@@ -191,73 +191,56 @@ size_t PmergeMe::_computeBatchSize(size_t n)
 /// @param val target value
 /// @param elemSize number of int in one elem
 /// @return index ajusted to 0 or main.size in edge cases
-size_t	PmergeMe::_binarySearch(t_vec& main, size_t ostart, size_t oend, int val, size_t elemSize)
+size_t	PmergeMe::_binarySearch(t_vec& main, size_t ostart, size_t oend, int val, size_t elemSize, bool isMainSize)
 {
 	const size_t	n = main.size();
-	int				start;
-	int				end;
-	size_t			span;
+	size_t			start;
+	size_t			end;
+	size_t			midElem;
 	size_t			mid;
-	size_t			rightMostIdx;
-	size_t			leftMostIdx;
-	size_t			insertIdx;
 
+	if (isMainSize)
+		std::cout << YELLOW << "main size" << NC << "\n";
 	if (n == 0 || elemSize == 0 || ostart > oend)
 		return 0;
-	if (oend >= n)
-		end = n - 1;
-	start = alignToRightmost(main.size(), elemSize, ostart);
-	end = alignToRightmost(main.size(), elemSize, oend);
+	start = ostart / elemSize;
+	end = std::min(oend, main.size() - 1) / elemSize;
+	// if (isMainSize)
+	// 	++end;
+	if ((end == 1 || oend == main.size() + elemSize) && isMainSize)
+		++end;
 
 	if (DEB)
 	{
 		printByPair(GREY "search:\t", &main, 0, elemSize);
-		std::cout << "bin search between start = " << start << " and end = " << end << NC << "\n";
 	}
 	while (_isOngoingBissect(start, end))
 	{
-		span = (end - start) / elemSize;
-		mid = start + (span / 2 * elemSize);
+		midElem = (start + end) / 2;
+		mid = midElem * elemSize + (elemSize - 1);
+		std::cout << "bin search between startElem #" << start << BLUE << " midElem=" << midElem << NC << " and endElem #= " << end << NC << "\n";
 		if (_isLowerInsert(main[mid], val))
 		{
+			// if (!isMainSize && start == main.size() / elemSize - 2)
+			// 	start = midElem + 2;
+			// else
+				start = midElem + 1;
 			if (DEB)
 			{
-				std::cout << main[mid] << RED << " < " << CYAN << val << NC << " ... incrementing start to " << mid + elemSize << NC << "\n";
+				std::cout << main[mid] << RED << " < " << CYAN << val << NC << " ... incrementing startElem to " << start << " and endElem=" << end << NC << "\n";
 			}
-			start = mid + elemSize;
-			if (start > end)
-				start = end;
 		}
 		else
 		{
+			end = midElem;
 			if (DEB)
 			{
-				std::cout << main[mid] << BLUE << " >= " << CYAN << val << NC << " ... decrementing end to " << mid - elemSize << NC << "\n";
+				std::cout << main[mid] << BLUE << " >= " << CYAN << val << NC << " ... decrementing endElem to " << end << " and startElem= " << start << NC << "\n";
 			}
-			end = mid - elemSize;
-			if (end < 0)
-				end = 0;
 		}
 	}
-	rightMostIdx = start;
-	leftMostIdx = rightMostIdx - (elemSize - 1);
-	if (_isUpperInsert(main[rightMostIdx], val))
-	{
-		if (DEB)
-		{
-			std::cout << "checking main[rightmost]=" << main[rightMostIdx] << BLUE << " > " << CYAN << val << NC << " ... setting insert idx to leftmost = " << leftMostIdx << NC << "\n";
-		}
-		insertIdx = leftMostIdx;
-	}
-	else
-	{
-		if (DEB)
-		{
-			std::cout << "checking main[rightmost]=" << main[rightMostIdx] << RED << " <= " << CYAN << val << NC << " ... setting insert idx to rightmost + 1 = " << rightMostIdx + 1 << NC << "\n";
-		}
-		insertIdx = rightMostIdx + 1;
-	}
-	return insertIdx;
+	std::cout << CYAN << "insert at elemIndex " << start << NC << std::endl;
+	return start * elemSize;
 }
 
 int	PmergeMe::_getValAtIndexInsert(t_list& l, size_t index)
@@ -276,7 +259,6 @@ int	PmergeMe::_getValAtIndexInsertOffset(t_list* l, size_t startIndex, int offse
 	// this->nbCompInsert += offset;
 	return (*it);
 }
-
 
 /// @brief binary search of lower insertion point for target val
 /// @param main container to search in
@@ -497,18 +479,19 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 		while (batchSize > 0 && i < data->size())
 		{
 			toInsert = (*data)[i];
-			boundIndex = std::min(main.size() + 1, (tk + nbInserted) * elemSize);
-			insertOffset = _binarySearch(main, 0, boundIndex, toInsert, elemSize);
+			boundIndex = std::min(main.size(), (tk + nbInserted) * elemSize);
+			bool isMainSize = boundIndex == main.size();
+			insertOffset = _binarySearch(main, 0, boundIndex, toInsert, elemSize, isMainSize);
 			fromIndex = i - elemSize + 1;
 			if (DEB)
 			{
 				printData(BLUE "main:\t", &main, depth, elemSize);
-				std::cout << "wanting to insert elem at index " << fromIndex << " = " << toInsert << " into main a index " << insertOffset << std::endl;
+				std::cout << "wanting to insert elem from #" << fromIndex << " to #" << i << " with leading value " << toInsert << " into main a index " << insertOffset << std::endl;
 			}
 			insertElemAtPos(main, data, elemSize, fromIndex, insertOffset);
 			if (!isSortedAsc(main, elemSize))
 			{
-				std::cout << BG_RED << "not sorted !!!!" << std::endl;
+				std::cout << BG_RED << "not sorted !!!!" << NC << std::endl;
 			}
 			i -= pairSize;
 			--pendingNb;
@@ -538,15 +521,28 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 	while (pendingNb > 0)
 	{
 		toInsert = (*data)[i];
-		boundIndex = std::min(main.size() + 1, (tk + nbInserted) * elemSize);
-		insertOffset = _binarySearch(main, elemSize - 1, boundIndex, toInsert, elemSize);
+		if (DEB)
+		{
+			std::cout << "tk=" << tk << std::endl;
+			std::cout << "nbInserted=" << nbInserted << std::endl;
+		}
+		// boundIndex = std::min(main.size() + elemSize, (tk + nbInserted + 1) * elemSize);
+		boundIndex = main.size() + elemSize;
+		std::cout << "boundIndex=" << boundIndex << "\n";
+		// bool isMainSize = boundIndex == main.size() + elemSize;
+		insertOffset = _binarySearch(main, elemSize - 1, boundIndex, toInsert, elemSize, true);
 		fromIndex = i - elemSize + 1;
 		if (DEB)
 		{
-			printData(BLUE "main:\t", &main, depth, elemSize);
-			std::cout << "wanting to insert elem at index " << fromIndex << " = " << toInsert << " into main a index " << insertOffset << std::endl;
+			std::cout << "wanting to insert elem from #" << fromIndex << " to #" << i << " with leading value " << toInsert << " into main a index " << insertOffset << std::endl;
 		}
 		insertElemAtPos(main, data, elemSize, fromIndex, insertOffset);
+
+		if (!isSortedAsc(main, elemSize))
+		{
+			std::cout << BG_RED << "not sorted !!!!" << NC << std::endl;
+		}
+
 		--pendingNb;
 		++nbInserted;
 		i += pairSize;
@@ -572,7 +568,7 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 	}		
 	*data = main;
 	#ifdef DEBUG
-	printData(GREEN "sorted:\t", &main, depth, elemSize);
+	printData(BLUE "sorted:\t", &main, depth, elemSize);
 	#endif
 }
 
@@ -664,7 +660,7 @@ void	PmergeMe::_insert(t_list* data, size_t elemSize, int depth)
 				printData(BLUE "main:\t", &main, depth, elemSize);
 				if (!isSortedAsc(main, elemSize))
 				{
-					std::cout << BG_RED << "not sorted !!!!" << std::endl;
+					std::cout << BG_RED << "not sorted !!!!" << NC << std::endl;
 				}
 			}
 			i -= pairSize;
@@ -691,6 +687,7 @@ void	PmergeMe::_insert(t_list* data, size_t elemSize, int depth)
 		std::cout << "tk=" << tk << std::endl;
 		std::cout << "i=" << i << std::endl;
 		std::cout << "pendingNb=" << pendingNb << std::endl;
+		std::cout << "nbInserted=" << nbInserted << std::endl;
 	}
 	while (pendingNb > 0)
 	{
