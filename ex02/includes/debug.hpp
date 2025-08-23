@@ -7,6 +7,7 @@
 #include <iostream>
 #include <string>
 #include <iomanip>
+#include <algorithm>
 #include <cmath>
 
 #define DEB 1
@@ -22,6 +23,9 @@ void	printDepthOffset(int depth);
 
 template <typename C>
 bool	isSortedAsc(const C& cont, size_t elemSize);
+
+template <typename C>
+bool	hasAllElemsOfFirst(const C& first, const C& second);
 
 template <typename C>
 void	printByPairWithPending(const std::string& msgCol, const C* data, int depth, size_t elemSize, size_t batchSEndIdx, size_t batchSize, bool showMax = false);

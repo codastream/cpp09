@@ -51,21 +51,27 @@ bool	PmergeMe::_isOngoingBissect(T start, T end)
 template <typename T>
 bool	PmergeMe::_isLowerInsert(T found, T target)
 {
-	nbCompInsert++;
+	++nbCompInsert;
+	if (DEB)
+		std::cout << BG_WHITE << "+1 comparison : comparing if < " << found << " and " << target << NC << "... nbCompInsert now " << nbCompInsert << std::endl;
 	return found < target;
 }
 
 template <typename T>
 bool	PmergeMe::_isEqualInsert(T found, T target)
 {
-	nbCompInsert++;
+	++nbCompInsert;
+	if (DEB)
+		std::cout << BG_WHITE << "+1 comparison : comparing if == " << found << " and " << target << NC << "... nbCompInsert now " << nbCompInsert << std::endl;
 	return found == target;
 }
 
 template <typename T>
 bool	PmergeMe::_isUpperInsert(T lv, T rv)
 {
-	nbCompInsert++;
+	++nbCompInsert;
+	if (DEB)
+		std::cout << BG_WHITE << "+1 comparison : comparing if > " << lv << " and " << rv << NC << "... nbCompInsert now " << nbCompInsert << std::endl;
 	return lv > rv;
 }
 
@@ -73,6 +79,7 @@ bool	PmergeMe::_isUpperInsert(T lv, T rv)
 template <typename T>
 bool	PmergeMe::_isBeyondLast(T startIdx, T endIdx)
 {
-	nbCompInsert++;
+	if (DEB)
+		std::cout << BG_WHITE << "+0 comparison : comparing if > " << startIdx << " and " << endIdx << NC << "... nbCompInsert now " << nbCompInsert << std::endl;
 	return startIdx > endIdx;
 }

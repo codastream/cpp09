@@ -42,18 +42,18 @@ void	checkVector(PmergeMe& mi, int n)
 	printTitle(CYAN, "Before");
 	printData("data:\t", &(mi.vec), 0, 1);
 	mi.sort(&(mi.vec));
-	#ifdef DEBUG
-	if (!isSortedAsc(mi.vec, 1) || mi.vec.size() != static_cast<unsigned long>(n))
+	// #ifdef DEBUG
+	if (!isSortedAsc(mi.vec, 1) || mi.vec.size() != static_cast<unsigned long>(n) || !hasAllElemsOfFirst(mi.vecUnsorted, mi.vec))
 	{
 		std::cout << RED << "not sorted !" << NC << std::endl;
 		std::cout << "input of size " << n << " and sorted of size " << mi.vec.size() << std::endl;
 	}
 	else
 		std::cout << GREEN << "sorted !" << NC << std::endl;
-	#else
-	// (void) isSortedAsc<std::vector<int> >;
+	// #else
+	(void) isSortedAsc<std::vector<int> >;
 	(void) computeMinComparisons;
-	#endif
+	// #endif
 
 	printTitle(CYAN, "After");
 	printData("sorted:\t", &(mi.vec), 0, 1);
@@ -84,17 +84,17 @@ void	checkList(PmergeMe& mi, int n)
 	printTitle(CYAN, "Before");
 	printData("data:\t", &(mi.list), 0, 1);
 	mi.sort(&(mi.list));
-	#ifdef DEBUG
-	if (!isSortedAsc(mi.list, 1) || mi.list.size() != static_cast<unsigned long>(n))
+	// #ifdef DEBUG
+	if (!isSortedAsc(mi.list, 1) || mi.list.size() != static_cast<unsigned long>(n) || !hasAllElemsOfFirst(mi.listUnsorted, mi.list))
 	{
 		std::cout << RED << "not sorted !" << NC << std::endl;
 		std::cout << "input of size " << n << " and sorted of size " << mi.list.size() << std::endl;
 	}
 	else
 		std::cout << GREEN << "sorted !" << NC << std::endl;
-	#else
-	(void) computeMinComparisons;
-	#endif
+	// #else
+	// (void) computeMinComparisons;
+	// #endif
 
 	printTitle(CYAN, "After");
 	printData("sorted:\t", &(mi.list), 0, 1);
@@ -111,7 +111,7 @@ void	checkList(PmergeMe& mi, int n)
 
 	std::ostringstream oss;
 	std::string msg;
-	oss << "Time to process a range of " << n << " with std::vector";
+	oss << "Time to process a range of " << n << " with std::list";
 	msg = oss.str();
 	printTitleCompute(CYAN, msg);
 	std::cout << BLUE << "merge\t" << NC << std::fixed << std::setprecision(5) << mi.timeToMerge << " µsec" << std::endl;
@@ -127,15 +127,18 @@ int	main(int ac, char** av)
 		return 1;
 	}
 
-	PmergeMe	mi;
+	PmergeMe	miV;
+	PmergeMe	miL;
 	int			n = --ac;
 
 	printTitle(BG_BLUE, "RESULTS");
 	printTitle(BLUE, "Input size (n)");
 	std::cout << n << std::endl;
 
-	mi.initContainers(n, ++av);
+	char **argcp = av;
+	miV.initContainers(n, ++av);
+	miL.initContainers(n, ++argcp);
 
-	// checkVector(mi, n);
-	checkList(mi, n);
+	checkVector(miV, n);
+	checkList(miL, n);
 }

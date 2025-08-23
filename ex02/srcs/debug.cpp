@@ -13,7 +13,7 @@ bool	isLastNbOfElem(size_t i, size_t elemSize)
 bool	isPartOfBatch(size_t i, size_t elemSize, size_t batchEndIdx, size_t batchSize)
 {
 	size_t elemIndex = (i / elemSize);
-	return (elemIndex > 1 && elemIndex % 2 == 0 && i > (batchEndIdx - (batchSize * elemSize) - (elemSize)) && i <= batchEndIdx);
+	return (elemIndex > 1 && elemIndex % 2 == 0 && i >= (batchEndIdx - (batchSize * elemSize * 2) + (elemSize)) && i <= batchEndIdx);
 }
 
 bool	isFirstNbOfPair(size_t i, size_t elemSize)

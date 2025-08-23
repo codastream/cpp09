@@ -1,16 +1,40 @@
 template <typename C>
 bool	isSortedAsc(const C& cont, size_t elemSize)
 {
-	if (cont.size() < 2)
+	if (cont.size() < elemSize * 2)
 		return true;
-	typename C::const_iterator it = cont.begin();
 	typename C::const_iterator previt = cont.begin();
-	std::advance(it, elemSize + elemSize - 1);
 	std::advance(previt, elemSize - 1);
-	for (; it != cont.end(); std::advance(previt, elemSize), std::advance(it, elemSize))
+	typename C::const_iterator it = previt;
+	std::advance(it, elemSize);
+	for (;;)
 	{
 		if (*it < *previt)
+		{
+			std::cout << *it << " comes after " << *previt << std::endl;
 			return false;
+		}
+		typename C::const_iterator probe = it;
+		size_t k = elemSize;
+		while (k-- && probe != cont.end())
+			++probe;
+		if (probe == cont.end())
+			break ;
+		std::advance(previt, elemSize);
+		std::advance(it, elemSize);
+	}
+	return true;
+}
+
+template <typename C>
+bool	hasAllElemsOfFirst(const C& first, const C& second)
+{
+	for (typename C::const_iterator it = first.begin(); it != first.end(); ++it)
+	{
+		if (std::find(second.begin(), second.end(), *it) == second.end())
+		{
+			return false;
+		}
 	}
 	return true;
 }

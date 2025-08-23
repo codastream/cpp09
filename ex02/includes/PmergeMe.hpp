@@ -35,6 +35,8 @@ class PmergeMe {
 
 		t_vec					vec;
 		t_list					list;
+		t_vec					vecUnsorted;
+		t_list					listUnsorted;
 
 		PmergeMe();
 		~PmergeMe();
