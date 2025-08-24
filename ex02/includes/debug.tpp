@@ -119,3 +119,51 @@ void	printData(const std::string& msgCol, const C* data, int depth, size_t elemS
 	}
 	std::cout << NC << std::endl;
 }
+
+template <typename C>
+void	printMain(const std::string& msgCol, const C* pending, int depth, size_t elemSize, bool showMax)
+{
+	(void) depth;
+
+	std::cout << msgCol << YELLOW;
+	int	width = 10;
+	size_t size = pending->size();
+	typename C::const_iterator it = pending->begin();
+	for (size_t i = 0; i < size; ++i, ++it)
+	{
+		if (showMax && i != 0 && (i % elemSize) - 1 == 0)
+		{
+			std::cout << std::right << std::setw(width) << std::setfill('*') << GREEN << *it << GREY << "," << std::setfill(' ') << NC;
+		}
+		else
+			std::cout << std::right << std::setw(width) << std::setfill('*') << YELLOW << *it << NC << " " << std::setfill(' ');
+	}
+	std::cout << NC << std::endl;
+}
+
+template <typename C>
+void	printPending(const std::string& msgCol, const C* pending, int depth, size_t elemSize, int insertedNb, bool showMax)
+{
+	(void) depth;
+	int	width = 8;
+
+	std::cout << msgCol << YELLOW;
+
+	for (int i = 0; i < insertedNb; ++i)
+		std::cout << ".......... ";
+	size_t dataSize = pending->size();
+	typename C::const_iterator it = pending->begin();
+	for (size_t i = 0; i < dataSize; ++i)
+	{
+		if (showMax && i == elemSize * 2 - 1)
+			std::cout << std::right << std::setw(width) << BOLD_ON << *it << BOLD_OFF;
+		else
+			std::cout << std::right << std::setw(width) << *it;
+		if ((i % elemSize) - 1 == 0)
+			std::cout << ",";
+		else
+			std::cout << " ";
+		++it;
+	}
+	std::cout << NC << std::endl;
+}

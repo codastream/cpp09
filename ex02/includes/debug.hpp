@@ -36,6 +36,12 @@ void	printByPair(const std::string& msgCol, const C* data, int depth, size_t ele
 template <typename C>
 void	printData(const std::string& msgCol, const C* data, int depth, size_t elemSize, bool showMax = false);
 
+template <typename C>
+void	printMain(const std::string& msgCol, const C* pending, int depth, size_t elemSize, bool showMax = true);
+
+template <typename C>
+void	printPending(const std::string& msgCol, const C* pending, int depth, size_t elemSize, int insertedNb, bool showMax = true);
+
 #include "debug.tpp"
 
 #endif

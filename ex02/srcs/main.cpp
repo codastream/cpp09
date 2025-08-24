@@ -36,6 +36,19 @@ static int	computeMinComparisons(size_t n)
 	return static_cast<int>(std::ceil(sumLog2));
 }
 
+static int	computeFJWorstComparisons(size_t n)
+{
+	if (n < 1)
+		return 0;
+	int sum = 0.0L;
+	for (size_t k = 1; k <= n; ++k)
+	{
+		double value = (3.0 / 4.0) * k;
+		sum += static_cast<int>(std::ceil(log2(value)));
+	}
+	return sum;
+}
+
 void	checkVector(PmergeMe& mi, int n)
 {
 	printTitle(BG_CYAN, "vector");
@@ -53,14 +66,16 @@ void	checkVector(PmergeMe& mi, int n)
 	// #else
 	(void) isSortedAsc<std::vector<int> >;
 	(void) computeMinComparisons;
+	(void) computeFJWorstComparisons;
 	// #endif
 
 	printTitle(CYAN, "After");
 	printData("sorted:\t", &(mi.vec), 0, 1);
 
 	#ifdef DEBUG
-	printTitle(CYAN, "Expected theoretical complexity if n <= 12");
-	std::cout << BLUE << "theoretical min\t" << NC << computeMinComparisons(n) << std::endl;
+	printTitle(CYAN, "Expected theoretical complexity");
+	std::cout << BLUE << "log2(n!)\t" << NC << computeMinComparisons(n) << std::endl;
+	std::cout << BLUE << "log2(3n/4)\t" << NC << computeFJWorstComparisons(n) << std::endl;
 
 	printTitle(CYAN, "Nb of comparisons");
 	std::cout << BLUE << "merge\t" << NC << mi.nbCompMerge << std::endl;
