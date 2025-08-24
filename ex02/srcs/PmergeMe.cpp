@@ -553,7 +553,7 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 	while (pendingNb > 0)
 	{
 		toInsert = pending[elemSize - 1];
-		boundIndex = nbPairsinMain * 2 + nbInserted;
+		boundIndex = nbPairsinMain * 2 + 3 + nbInserted;
 		if (main.size() / elemSize < boundIndex)
 		{
 			boundIndex = main.size() / elemSize;
