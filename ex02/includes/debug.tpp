@@ -131,7 +131,7 @@ void	printMain(const std::string& msgCol, const C* pending, int depth, size_t el
 	typename C::const_iterator it = pending->begin();
 	for (size_t i = 0; i < size; ++i, ++it)
 	{
-		if (showMax && i != 0 && (i % elemSize) - 1 == 0)
+		if (showMax && ((i + 1) % elemSize) == 0)
 		{
 			std::cout << std::right << std::setw(width - 1) << std::setfill(' ') << GREEN << *it << GREY << "," << std::setfill(' ') << NC;
 		}
@@ -149,8 +149,11 @@ void	printPending(const std::string& msgCol, const C* pending, int depth, size_t
 
 	std::cout << msgCol << YELLOW;
 
-	if (insertedNb > 0) 
-		std::cout << "                                ";
+	if (insertedNb > 0)
+	{
+		for (size_t i = 0; i < elemSize; ++i)
+			std::cout << "                 ";
+	}
 	size_t dataSize = pending->size();
 	typename C::const_iterator it = pending->begin();
 	for (size_t i = 0; i < dataSize; ++i, ++it)
@@ -161,8 +164,11 @@ void	printPending(const std::string& msgCol, const C* pending, int depth, size_t
 		}
 		else
 		{
-			if (i > 0)
-				std::cout << "                ";
+			if (i > 0 && i % elemSize * 2 == 0)
+			{
+				for (size_t i = 0; i < elemSize; ++i)
+					std::cout << "        ";
+			}
 			std::cout << std::right << std::setw(width) << std::setfill(' ') << YELLOW << *it << NC << " " << std::setfill(' ');
 		}
 	}
