@@ -431,7 +431,7 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 
 	#ifdef DEBUG
 		printMain(BLUE "main:\t", &main, depth, elemSize);
-		printPending(BLUE "pend.:\t", &pending, depth, elemSize, 1);
+		printPending(BLUE "pend.:\t", &pending, depth, elemSize, 2);
 	#endif
 
 	size_t					k = 3;
