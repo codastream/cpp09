@@ -133,10 +133,10 @@ void	printMain(const std::string& msgCol, const C* pending, int depth, size_t el
 	{
 		if (showMax && i != 0 && (i % elemSize) - 1 == 0)
 		{
-			std::cout << std::right << std::setw(width) << std::setfill(' ') << GREEN << *it << GREY << "," << std::setfill(' ') << NC;
+			std::cout << std::right << std::setw(width - 1) << std::setfill(' ') << GREEN << *it << GREY << "," << std::setfill(' ') << NC;
 		}
 		else
-			std::cout << std::right << std::setw(width) << std::setfill(' ') << YELLOW << *it << NC << " " << std::setfill(' ');
+			std::cout << std::right << std::setw(width) << std::setfill(' ') << YELLOW << *it << NC << "  " << std::setfill(' ');
 	}
 	std::cout << NC << std::endl;
 }

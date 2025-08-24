@@ -431,7 +431,6 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 
 	#ifdef DEBUG
 		printMain(BLUE "main:\t", &main, depth, elemSize);
-		printPending(BLUE "pend.:\t", &pending, depth, elemSize, 2);
 	#endif
 
 	size_t					k = 3;
@@ -546,27 +545,33 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 	std::cout << "pendingNb=" << pendingNb << std::endl;
 	#endif
 	nbInserted = 0;
-	iPend = 0;
+	iPend = elemSize - 1;
 	while (pendingNb > 0)
 	{
-		toInsert = (*data)[iPend];
+		toInsert = pending[iPend];
+		boundIndex = tk + nbInserted * elemSize;
+		insertOffset = _binarySearch(main, 0, boundIndex, toInsert, elemSize, false);
+		fromIndex = iPend - (elemSize + 1);
+
 		#ifdef DEBUG
 		std::cout << "tk=" << tk << std::endl;
 		std::cout << "nbInserted=" << nbInserted << std::endl;
-		#endif
-		boundIndex = std::min(main.size(), tk + nbInserted * elemSize);
 		std::cout << "boundIndex=" << boundIndex << "\n";
-		insertOffset = _binarySearch(main, elemSize - 1, boundIndex, toInsert, elemSize, true);
-		fromIndex = iPend - elemSize + 1;
-		#ifdef DEBUG
+		std::cout << "insertOffset=" << insertOffset << "\n";
+		std::cout << "fromIndex=" << fromIndex << "\n";
 		std::cout << "wanting to insert elem from #" << fromIndex << " to #" << i << " with leading value " << toInsert << " into main a index " << insertOffset << std::endl;
 		#endif
-		insertElemAtPos(main, data, elemSize, fromIndex, insertOffset);
+
+		insertElemAtPos(main, &pending, elemSize, fromIndex, insertOffset);
+		#ifdef DEBUG
+			printMain(BLUE "main:\t", &main, depth, elemSize);
+		#endif
 
 		if (!isSortedAsc(main, elemSize))
 		{
 			std::cout << BG_RED << "not sorted !!!!" << NC << std::endl;
 		}
+		iPend -= elemSize;
 		--pendingNb;
 		++tk;
 		++nbInserted;
