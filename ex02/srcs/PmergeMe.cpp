@@ -191,22 +191,22 @@ size_t PmergeMe::_computeBatchSize(size_t n)
 /// @param val target value
 /// @param elemSize number of int in one elem
 /// @return index ajusted to 0 or main.size in edge cases
-size_t	PmergeMe::_binarySearch(t_vec& main, size_t ostart, size_t oend, int val, size_t elemSize, bool isMainSize)
+size_t	PmergeMe::_binarySearch(t_vec& main, size_t start, size_t end, int val, size_t elemSize, bool isMainSize)
 {
 	const size_t	n = main.size();
-	size_t			start;
-	size_t			end;
+	// size_t			start;
+	// size_t			end;
 	size_t			midElem;
 	size_t			mid;
 
 	if (isMainSize)
 		std::cout << YELLOW << "isMainSize" << NC << "\n";
-	std::cout << "oend=" << oend << "\n";
-	if (n == 0 || elemSize == 0 || ostart > oend)
+	// std::cout << "oend=" << oend << "\n";
+	if (n == 0 || elemSize == 0 || start > end)
 		return 0;
-	start = ostart / elemSize;
-	end = oend / elemSize;
-	++oend;
+	// start = ostart / elemSize;
+	// end = oend / elemSize;
+	// ++end;
 	std::cout  << start << " " << end << " " << BG_YELLOW  << "area of comp = \t\t\t\t"<< end - start << NC << std::endl;
 	if (DEB)
 	{
@@ -450,6 +450,7 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 	int						toInsert;
 	size_t					insertOffset;
 	size_t					fromIndex;
+	size_t					nbPairsinMain = 1;
 
 	size_t					nbInserted = 0;
 	size_t					iPend;
@@ -486,12 +487,14 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 		while (j < batchSize)
 		{
 			toInsert = pending[iPend];
-			boundIndex = (tk) * elemSize;
+			boundIndex = nbPairsinMain + batchSize + nbInserted;
 
 			#ifdef DEBUG
 			std::cout << "tk=" << tk << std::endl;
 			std::cout << "nbInserted=" << nbInserted << std::endl;
 			std::cout << "boundIndex=" << boundIndex << "\n";
+			std::cout << "iPend=" << iPend << "\n";
+			std::cout << "nbPairsInMain=" << nbPairsinMain << "\n";
 			#endif
 
 			insertOffset = _binarySearch(main, 0, boundIndex, toInsert, elemSize, false);
@@ -522,6 +525,7 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 
 		eraseElemsAtFront(pending, elemSize, batchSize);
 		
+		nbPairsinMain += batchSize;
 		++k;
 		if (k > _jacobLen)
 			throw std::out_of_range("trying to reach beyond registered elems of Jacobstahl sequence");
@@ -549,19 +553,20 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 	while (pendingNb > 0)
 	{
 		toInsert = pending[elemSize - 1];
-		boundIndex = (tk + nbInserted) * elemSize;
-		if (main.size() < boundIndex)
+		boundIndex = nbPairsinMain * 2 + nbInserted;
+		if (main.size() / elemSize < boundIndex)
 		{
-			boundIndex = main.size();
+			boundIndex = main.size() / elemSize;
 			#ifdef DEBUG
+			std::cout << BLUE << "mainSize shorter : " << NC << std::endl;
 			std::cout << "boundIndex=" << boundIndex << std::endl;
-			std::cout << "mainSize shorter : " << main.size() << std::endl;
 			#endif
 		}
 		#ifdef DEBUG
 		std::cout << "tk=" << tk << std::endl;
 		std::cout << "nbInserted=" << nbInserted << std::endl;
 		std::cout << "boundIndex=" << boundIndex << "\n";
+		std::cout << "nbPairsInMain=" << nbPairsinMain << "\n";
 		#endif
 
 		insertOffset = _binarySearch(main, 0, boundIndex, toInsert, elemSize, false);
@@ -582,7 +587,6 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 		eraseElemsAtFront(pending, elemSize, 1);
 		// iPend += elemSize;
 		--pendingNb;
-		++tk;
 		++nbInserted;
 		#ifdef DEBUG
 		i += pairSize;
