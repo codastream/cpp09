@@ -460,7 +460,6 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 
 	size_t					nbInserted = 0;
 	size_t					iPend;
-	bool					hasOddPending = pendingNb % 2 != 0;
 	#ifdef DEBUG
 	size_t					i = 0;
 	size_t					prevI = elemSize - 1;
@@ -553,25 +552,17 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 	std::cout << "k=" << k << std::endl;
 	std::cout << "tk=" << tk << std::endl;
 	std::cout << "i=" << i << std::endl;
-	std::cout << "pendingNb=" << pendingNb << std::endl;
+	std::cout << CYAN << "pendingNb=" << pendingNb << NC << std::endl;
 	#endif
 	nbInserted = 0;
-	// iPend = elemSize - 1;
 	while (pendingNb > 0)
 	{
-		if (hasOddPending && pendingNb == 1)
+		if (pendingNb == 1)
 		{
 			toInsert = pending[elemSize - 1];
 			boundIndex = nbElems;
-			if (main.size() / elemSize < boundIndex)
-			{
-				boundIndex = nbElems;
-				#ifdef DEBUG
-				std::cout << BLUE << "mainSize shorter : " << NC << std::endl;
-				std::cout << "boundIndex=" << boundIndex << std::endl;
-				#endif
-			}
 			#ifdef DEBUG
+			std::cout << BG_PURPLE << "last elem with nbElems= " << nbElems << NC << std::endl;
 			std::cout << "tk=" << tk << std::endl;
 			std::cout << "nbInserted=" << nbInserted << std::endl;
 			std::cout << "boundIndex=" << boundIndex << "\n";
@@ -600,11 +591,11 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 			#ifdef DEBUG
 			i += pairSize;
 			#endif
-			continue ;
+			break ;
 		}
 
 		toInsert = pending[elemSize - 1];
-		boundIndex = nbPairsinMain * 2 + 1 + nbInserted;
+		boundIndex = nbPairsinMain * 2 + nbInserted * 2 + 1;
 		if (main.size() / elemSize < boundIndex)
 		{
 			boundIndex = main.size() / elemSize;
