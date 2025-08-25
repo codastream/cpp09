@@ -150,7 +150,7 @@ void	printPending(const std::string& msgCol, const C* pending, int depth, size_t
 	if (insertedNb > 0)
 	{
 		for (size_t i = 0; i < elemSize; ++i)
-			std::cout << "                 ";
+			std::cout << "                ";
 	}
 	size_t dataSize = pending->size();
 	typename C::const_iterator it = pending->begin();
@@ -165,7 +165,7 @@ void	printPending(const std::string& msgCol, const C* pending, int depth, size_t
 			if (i > 0 && i % elemSize * 2 == 0)
 			{
 				for (size_t i = 0; i < elemSize; ++i)
-					std::cout << "        ";
+					std::cout << "       ";
 			}
 			std::cout << YELLOW << std::right << std::setw(width) << std::setfill(' ') << *it << NC << " " << std::setfill(' ');
 		}

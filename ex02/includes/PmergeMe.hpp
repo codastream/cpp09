@@ -60,7 +60,6 @@ class PmergeMe {
 		size_t					_binarySearch(t_vec& main, size_t start, size_t end, int val, size_t elemSize);
 		size_t					_binarySearch(t_list& main, size_t start, size_t end, int val, size_t elemSize);
 		
-		int						_getValAtIndexInsert(t_list& l, size_t index);
 		int						_getValAtIndexInsertOffset(t_list* l, size_t startIndex, int offset);
 
 		template <typename T>
