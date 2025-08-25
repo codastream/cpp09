@@ -62,7 +62,10 @@ void	checkVector(PmergeMe& mi, int n)
 		std::cout << "input of size " << n << " and sorted of size " << mi.vec.size() << std::endl;
 	}
 	else
-		std::cout << GREEN << "sorted !" << NC << std::endl;
+	{
+		if (DEB)
+			std::cout << GREEN << "sorted !" << NC << std::endl;
+	}
 	// #else
 	(void) isSortedAsc<std::vector<int> >;
 	(void) computeMinComparisons;
@@ -78,9 +81,9 @@ void	checkVector(PmergeMe& mi, int n)
 	std::cout << BLUE << "log2(3n/4)\t" << NC << computeFJWorstComparisons(n) << std::endl;
 
 	printTitle(CYAN, "Nb of comparisons");
-	std::cout << BLUE << "merge\t" << NC << mi.nbCompMerge << std::endl;
-	std::cout << BLUE << "insert\t" << NC << mi.nbCompInsert << std::endl;
-	std::cout << B_BLUE << "total\t" << NC << mi.nbCompMerge + mi.nbCompInsert << std::endl;
+	std::cout << BLUE << "merge\t\t" << NC << mi.nbCompMerge << std::endl;
+	std::cout << BLUE << "insert\t\t" << NC << mi.nbCompInsert << std::endl;
+	std::cout << B_BLUE << "total\t\t" << NC << mi.nbCompMerge + mi.nbCompInsert << std::endl;
 	#endif
 
 	std::ostringstream oss;
@@ -88,9 +91,9 @@ void	checkVector(PmergeMe& mi, int n)
 	oss << "Time to process a range of " << n << " with std::vector";
 	msg = oss.str();
 	printTitleCompute(CYAN, msg);
-	std::cout << BLUE << "merge\t" << NC << std::fixed << std::setprecision(5) << mi.timeToMerge << " µsec" << std::endl;
-	std::cout << BLUE << "insert\t" << NC << std::fixed << std::setprecision(5) << mi.timeToInsert << " µsec" << std::endl;
-	std::cout << B_BLUE << "total\t" << NC << std::fixed << std::setprecision(5) << mi.timeToMerge + mi.timeToInsert << " µsec" << std::endl;
+	std::cout << BLUE << "merge\t\t" << NC << std::fixed << std::setprecision(5) << mi.timeToMerge << " µsec" << std::endl;
+	std::cout << BLUE << "insert\t\t" << NC << std::fixed << std::setprecision(5) << mi.timeToInsert << " µsec" << std::endl;
+	std::cout << B_BLUE << "total\t\t" << NC << std::fixed << std::setprecision(5) << mi.timeToMerge + mi.timeToInsert << " µsec" << std::endl;
 }
 
 void	checkList(PmergeMe& mi, int n)

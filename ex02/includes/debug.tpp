@@ -112,9 +112,9 @@ void	printData(const std::string& msgCol, const C* data, int depth, size_t elemS
 	for (size_t i = 0; i < dataSize; ++i)
 	{
 		if (showMax && i == elemSize * 2 - 1)
-			std::cout << BLUE << std::right << std::setw(width) << *it << ' ' << NC;
+			std::cout << BLUE << std::right << std::setw(width) << *it << GREY << ' ' << NC;
 		else
-			std::cout << std::right << std::setw(width) << *it << ' ';
+			std::cout << YELLOW << std::right << std::setw(width) << *it << GREY << ' ';
 		++it;
 	}
 	std::cout << NC << std::endl;
@@ -126,17 +126,15 @@ void	printMain(const std::string& msgCol, const C* pending, int depth, size_t el
 	(void) depth;
 
 	std::cout << msgCol << YELLOW;
-	int	width = 10;
+	int	width = 7;
 	size_t size = pending->size();
 	typename C::const_iterator it = pending->begin();
 	for (size_t i = 0; i < size; ++i, ++it)
 	{
 		if (showMax && ((i + 1) % elemSize) == 0)
-		{
-			std::cout << std::right << std::setw(width - 1) << std::setfill(' ') << GREEN << *it << GREY << "," << std::setfill(' ') << NC;
-		}
+			std::cout << GREEN << std::right << std::setw(width) << *it << GREY << "," << NC;
 		else
-			std::cout << std::right << std::setw(width) << std::setfill(' ') << YELLOW << *it << NC << "  " << std::setfill(' ');
+			std::cout << YELLOW << std::right << std::setw(width) << *it << GREY << " " << NC;
 	}
 	std::cout << NC << std::endl;
 }
@@ -145,7 +143,7 @@ template <typename C>
 void	printPending(const std::string& msgCol, const C* pending, int depth, size_t elemSize, int insertedNb, bool showMax)
 {
 	(void) depth;
-	int	width = 10;
+	int	width = 7;
 
 	std::cout << msgCol << YELLOW;
 
@@ -160,7 +158,7 @@ void	printPending(const std::string& msgCol, const C* pending, int depth, size_t
 	{
 		if (showMax && i != 0 && (i % elemSize) - 1 == 0)
 		{
-			std::cout << std::right << std::setw(width) << std::setfill(' ') << YELLOW << BOLD_ON << *it << BOLD_OFF << GREY << "," << std::setfill(' ') << NC;
+			std::cout << YELLOW << BOLD_ON << std::right << std::setw(width) << std::setfill(' ') << *it << GREY << "," << std::setfill(' ') << NC;
 		}
 		else
 		{
@@ -169,7 +167,7 @@ void	printPending(const std::string& msgCol, const C* pending, int depth, size_t
 				for (size_t i = 0; i < elemSize; ++i)
 					std::cout << "        ";
 			}
-			std::cout << std::right << std::setw(width) << std::setfill(' ') << YELLOW << *it << NC << " " << std::setfill(' ');
+			std::cout << YELLOW << std::right << std::setw(width) << std::setfill(' ') << *it << NC << " " << std::setfill(' ');
 		}
 	}
 	std::cout << NC << std::endl;
