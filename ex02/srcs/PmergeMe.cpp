@@ -204,6 +204,12 @@ size_t	PmergeMe::_binarySearch(t_vec& main, size_t start, size_t end, int val, s
 	// std::cout << "oend=" << oend << "\n";
 	if (n == 0 || elemSize == 0 || start > end)
 		return 0;
+	size_t nbElems = main.size() / elemSize;
+	if (end > nbElems)
+	{
+		std::cout << BG_YELLOW << "end out of bounds ... reducing insertion area\n" << NC;
+		end = nbElems;
+	}
 	// start = ostart / elemSize;
 	// end = oend / elemSize;
 	// ++end;
@@ -454,6 +460,7 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 
 	size_t					nbInserted = 0;
 	size_t					iPend;
+	bool					hasOddPending = pendingNb % 2 != 0;
 	#ifdef DEBUG
 	size_t					i = 0;
 	size_t					prevI = elemSize - 1;
@@ -487,7 +494,7 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 		while (j < batchSize)
 		{
 			toInsert = pending[iPend];
-			boundIndex = nbPairsinMain + batchSize + nbInserted;
+			boundIndex = (nbPairsinMain * 2) + batchSize - 1;
 
 			#ifdef DEBUG
 			std::cout << "tk=" << tk << std::endl;
@@ -552,8 +559,52 @@ void	PmergeMe::_insert(t_vec* data, size_t elemSize, int depth)
 	// iPend = elemSize - 1;
 	while (pendingNb > 0)
 	{
+		if (hasOddPending && pendingNb == 1)
+		{
+			toInsert = pending[elemSize - 1];
+			boundIndex = nbElems;
+			if (main.size() / elemSize < boundIndex)
+			{
+				boundIndex = nbElems;
+				#ifdef DEBUG
+				std::cout << BLUE << "mainSize shorter : " << NC << std::endl;
+				std::cout << "boundIndex=" << boundIndex << std::endl;
+				#endif
+			}
+			#ifdef DEBUG
+			std::cout << "tk=" << tk << std::endl;
+			std::cout << "nbInserted=" << nbInserted << std::endl;
+			std::cout << "boundIndex=" << boundIndex << "\n";
+			std::cout << "nbPairsInMain=" << nbPairsinMain << "\n";
+			#endif
+
+			insertOffset = _binarySearch(main, 0, boundIndex, toInsert, elemSize, false);
+			fromIndex = 0;
+			insertElemAtPos(main, &pending, elemSize, fromIndex, insertOffset);
+
+			#ifdef DEBUG
+			std::cout << "insertOffset=" << insertOffset << "\n";
+			std::cout << "fromIndex=" << fromIndex << "\n";
+			std::cout << "wanting to insert elem from #" << fromIndex << " to #" << i << " with leading value " << toInsert << " into main a index " << insertOffset << std::endl;
+			printMain(BLUE "main:\t", &main, depth, elemSize);
+			#endif
+
+			if (!isSortedAsc(main, elemSize))
+			{
+				std::cout << BG_RED << "not sorted !!!!" << NC << std::endl;
+			}
+			eraseElemsAtFront(pending, elemSize, 1);
+			// iPend += elemSize;
+			--pendingNb;
+			++nbInserted;
+			#ifdef DEBUG
+			i += pairSize;
+			#endif
+			continue ;
+		}
+
 		toInsert = pending[elemSize - 1];
-		boundIndex = nbPairsinMain * 2 + 3 + nbInserted;
+		boundIndex = nbPairsinMain * 2 + 1 + nbInserted;
 		if (main.size() / elemSize < boundIndex)
 		{
 			boundIndex = main.size() / elemSize;
