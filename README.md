@@ -1,4 +1,4 @@
-#cpp 09
+# cpp 09
 
 ## iterators
 iterators provide a homogenic interface when working with containers. in other word, they help decouple algorithms from container implementations (eg traversal of a container implemented with contiguous memory vs one implemented as a binary tree).
@@ -42,11 +42,10 @@ int main() {
 - `list`, associative containers (`set`, `map`)
  `insert`, `erase` only invalidate iterators to erased elements
 
-### uses of iterators
+### usage of iterators
 
 - for normal or reverse traversal
 - most of std::algorithm (find, count, for_each, copy, sort...) are range-based and work on iterators although some containers require a specific implementation. See also _iterator adaptators_ that call container functions with iterators (useful for ranges) : `back_inserter`, `front_inserter`, `inserter`
-
 
 ### caveats
 
@@ -64,7 +63,86 @@ int main() {
 - cbegin / cend / crbegin / crend for const iterators
 - new iterator adapters : `std::move_iterator`, `std::make_move_iterator`
 
-## recap on file i/o
+## Time
+### time formatting
+
+- format string syntax : Y-m-d
+- we use a `std::tm` struct to access separate values of year, month, ...
+
+### time conversion
+
+- `char*` -> `tm` : `strptime()` (POSIX, non portable) - `std::get_time()` (standard c++)
+- `time_t` -> `tm` : `localtime()`, `gmtime()`
+- `time_t` -> `char*` : `ctime()`
+- `tm` -> `time_t` : `mktime()`
+- `tm` -> `char*` : `strftime()` - `asctime()`
+
+⚠️ `ctime` and `asctime` are unsafe as they return static buffer pointers
+⚠️ `std::mktime` automatically normalizes invalid dates to valid ones
+
+https://cplusplus.com/reference/ctime/localtime/
+https://cplusplus.com/reference/iomanip/get_time
+
+### time measure
+
+```c++
+#include <ctime>
+
+clock_t start = clock();
+clock_t end = clock();
+double elapsed = double(end / start) / CLOCKS_PER_SEC;
+```
+
+### Evolutions in c++11
+- `std::chrono` with parse, format utilities
+
+### Evolutions in c++20
+- `<format>` can be used instead of `<iomanip>`
+- `<chrono>` with `parse`
+
+## Containers
+
+### usage of map
+- specific methods : `key_comp`, `value_comp`
+https://en.cppreference.com/w/cpp/container/map.html 
+https://cplusplus.com/reference/utility/make_pair/
+
+### usage of stack
+- specific methods : `push`, `pop`, `top`
+https://en.cppreference.com/w/cpp/container/stack.html 
+
+### usage of vector
+https://en.cppreference.com/w/cpp/container/vector.html
+
+### usage of deque
+- specific methods : `push_front`, `pop_front` (same as list)
+https://en.cppreference.com/w/cpp/header/deque.html
+
+### usage of list
+- specific methods : `merge`, `splice`, `remove`, `remove_if`, `reverse`, `unique`, `sort`
+https://en.cppreference.com/w/cpp/header/list.html
+
+### useful class templates
+https://en.cppreference.com/w/cpp/utility/pair.html
+
+## Algorithm - Merge insertion sort
+
+Merge insertion sort was created in 1959 by two mathematicians (Lester Ford)[https://en.wikipedia.org/wiki/L._R._Ford_Jr.] and (Selmer Johnson)[https://en.wikipedia.org/wiki/Selmer_M._Johnson]. It was aiming at minimizing the number of comparisons, and achieves to do so for small datasets (< 12 elems - or even 18 ?) for which it reaches O(n logn), the theoretical minimal comparison number.
+
+First step (merge) consists of presorting values by pairs of min and max.
+Second step (insert) consists of sorting the max elements (aka a elements), then carefully inserting min elements (aka pending or b) in a certain order. The Jacobstahl sequence grants that for n numbers being inserted in total, the insertion area will be less than `2^n+1`, which happens to generate as many comparisons in binary search as `2^n`.
+
+![steps](miso.png "Merge insertion sort steps")
+
+I encountered the following challenges during the implementation
+- keeping track of the index of the max element associated with pending min element
+- understanding a few subtleties of iterators (kinds, invalidation)
+- trying to avoid boilerplate code by making use of existing algorithms
+
+Current implementation is still not optimal, but approaches the theoretical max number of comparisons for the Ford Johnson algorithm, which can be approximated to O(n log2 3/4n)
+
+## Other recaps
+### recap on file i/o
 ```c++
 #include <fstream>
 #include <iostream>
@@ -84,7 +162,7 @@ if (!fs.is_open()) {...}
 
 https://en.cppreference.com/w/cpp/io/basic_ifstream.html
 
-## recap on string processing
+### recap on string processing
 ```c++
 #include <string>
 #include <sstream>
@@ -100,57 +178,5 @@ std::string token1, sep, token2;
 ss >> token1 >> sep >> token2;
 ```
 
-## recap on conversion
+### recap on conversion
 - `std::stod`, ...
-
-## time formatting
-
-- format string syntax : Y-m-d
-- we use a `std::tm` struct to access separate values of year, month, ...
-
-## time measure
-
-```c++
-#include <ctime>
-
-clock_t start = clock();
-clock_t end = clock();
-double elapsed = double(end / start) / CLOCKS_PER_SEC;
-```
-
-## usage of map
-- specific methods : `key_comp`, `value_comp`
-https://en.cppreference.com/w/cpp/container/map.html 
-https://cplusplus.com/reference/utility/make_pair/
-
-## usage of stack
-- specific methods : `push`, `pop`, `top`
-https://en.cppreference.com/w/cpp/container/stack.html 
-
-## usage of vector
-https://en.cppreference.com/w/cpp/container/vector.html
-
-## usage of deque
-- specific methods : `push_front`, `pop_front` (same as list)
-https://en.cppreference.com/w/cpp/header/deque.html
-
-## usage of list
-- specific methods : `merge`, `splice`, `remove`, `remove_if`, `reverse`, `unique`, `sort`
-https://en.cppreference.com/w/cpp/header/list.html
-
-## recap on algorithm
-
-Merge insertion sort was created in 1959 by two mathematicians (Lester Ford)[https://en.wikipedia.org/wiki/L._R._Ford_Jr.] and (Selmer Johnson)[https://en.wikipedia.org/wiki/Selmer_M._Johnson]. It was aiming at minimizing the number of comparisons, and achieves to do so for small datasets (< 12 elems) for which it reaches O(n logn), the theoretical minimal comparison number.
-
-First step (merge) consists of presorting values by pairs of min and max. Second step (insert) consists of sorting the max elements, then carefully inserting min elements in a certain order. The Jacobstahl sequence grows in the same proportion as the sorted list, granting an homogenous distribution and coincidentally limiting the number of comparisons. The algorithm is recursive.
-
-## Sources
-https://cplusplus.com/reference/iomanip/get_time
-
-
-## Evolutions in c++11
-- `std::chrono`
-
-## Evolutions in c++20
-- `<format>` can be used instead of `<iomanip>`
-- `<chrono>` with `parse`

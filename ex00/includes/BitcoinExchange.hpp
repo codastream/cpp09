@@ -47,7 +47,7 @@ class BitcoinExchange {
 		bool		_parseLine(std::string& s, char sep, timeVal_t& map, bool isInput);
 		bool		_parseRates(const char* filename);
 		void		_printFromInput(const char* filename);
-		void		_printValue(std::tm time, double qty);
+		void		_printValue(time_t key, std::tm time, double qty);
 		double		_getRateForClosestLowerDate(const std::time_t& time);
 };
 
