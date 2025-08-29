@@ -17,5 +17,5 @@ void	printTitleCompute(const std::string& col, const std::string& msg)
 
 void	puterr()
 {
-	std::cerr << "Error" << std::endl;
+	std::cerr << RED << "Error" << NC << std::endl;
 }
