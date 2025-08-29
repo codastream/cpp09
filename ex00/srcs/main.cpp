@@ -6,7 +6,7 @@
 /*   By: fpetit <fpetit@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 13:21:53 by fpetit            #+#    #+#             */
-/*   Updated: 2025/08/09 14:40:15 by fpetit           ###   ########.fr       */
+/*   Updated: 2025/08/29 14:14:11 by fpetit           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,13 +17,13 @@ bool	checkArgs(int ac, char **av)
 {
 	if (ac != 2)
 	{
-		std::cerr << RED << "usage: ./btc <input.txt>" << NC << std::endl;
+		std::cerr << RED << "usage: ./btc <input.csv>" << NC << std::endl;
 		return false;
 	}
 	std::string filename = av[1];
-	if (filename.length() <= 4 || filename.compare(filename.length() - 4, 4, ".txt"))
+	if (filename.length() <= 4 || filename.compare(filename.length() - 4, 4, ".csv"))
 	{
-		std::cerr << RED << "provided file should be a .txt" << NC << std::endl;
+		std::cerr << RED << "please provide an input.csv" << NC << std::endl;
 		return false;
 	}
 	return true;

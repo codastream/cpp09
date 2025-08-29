@@ -81,7 +81,7 @@ bool	RPN::compute(const std::string& s)
 		{
 			_args.push(c - '0');
 		}
-		else if (allowed.find(c) != std::string::npos)
+		else if (allowed.find(c) != std::string::npos && token.size() == 1)
 		{
 			if (_args.size() < 2)
 			{
