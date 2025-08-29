@@ -51,8 +51,8 @@ run_test "complex" "7 7 * 7 -" "42"
 run_test "should just stack" "1 2 * 2 / 2 * 2 4 - +" "0"
 
 run_test "invalid token ()" "(1 1 +)" "Error"
-run_test "missing operator" "1 1" "Error"
-run_test "missing operand" "1 +" "Error"
+run_test "missing operator" "1 1 + 1" "Error"
+run_test "missing operand" "1 1 + -" "Error"
 
 echo "=============================="
 echo "TOTAL"

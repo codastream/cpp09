@@ -12,7 +12,7 @@ void	printcol(const std::string& col, const std::string& msg)
 
 void	puterr()
 {
-	std::cerr << RED << "Error" << NC << std::endl;
+	std::cerr << "Error" << std::endl;
 }
 
 void	puterr(const std::string& msg)
