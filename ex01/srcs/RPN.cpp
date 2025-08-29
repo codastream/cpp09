@@ -48,8 +48,6 @@ int	divi(int a, int b)
 	return a / b;
 }
 
-typedef int (*opf)(int, int);
-
 const opf opfuncs[4] = {add, sub, mult, divi};
 const char opsigns[4] = {'+', '-', '*', '/'};
 
@@ -72,24 +70,18 @@ bool	RPN::compute(const std::string& s)
 	int res = 0;
 
 	const std::string& allowed = "+-*/";
-	std::string::const_iterator cit = s.begin();
-	for (; cit != s.end(); cit++)
+
+	std::istringstream iss(s);
+	std::string token;
+
+	while (iss >> token)
 	{
-		if (cit != s.begin() && *cit == ' ')
+		char c = token[0];
+		if (std::isdigit(c) && token.size() == 1)
 		{
-			if (*(--cit) == ' ')
-			{
-				puterr();
-				return false;
-			}
-			else
-				cit++;
+			_args.push(c - '0');
 		}
-		else if (std::isdigit(*cit))
-		{
-			_args.push(*cit - '0');
-		}
-		else if (allowed.find(*cit) != std::string::npos)
+		else if (allowed.find(c) != std::string::npos)
 		{
 			if (_args.size() < 2)
 			{
@@ -100,7 +92,12 @@ bool	RPN::compute(const std::string& s)
 			_args.pop();
 			a = _args.top();
 			_args.pop();
-			doOp(a, b, *cit, &res);
+			if (c == '/' && b == 0)
+			{
+				puterr("can't divide by 0");
+				return false;
+			}
+			doOp(a, b, c, &res);
 			_args.push(res);
 		}
 		else
@@ -109,7 +106,8 @@ bool	RPN::compute(const std::string& s)
 			return false;
 		}
 	}
-	if (cit != s.end() || _args.size() != 1)
+	
+	if (_args.size() != 1)
 	{
 		puterr();
 		return false;
@@ -118,23 +116,3 @@ bool	RPN::compute(const std::string& s)
 		std::cout << res << std::endl;
 	return true;
 }
-
-// void	RPN::_addArgs(int ac, char *av)
-// {
-// 	int i = std::strlen(av) - 1;
-// 	while (av[i])
-// 	{
-// 		if (i > 0 && av[i - 1] && av[i - 1] != ' ')
-// 		{
-// 			std::string msg = "unexpected token " + av[i - 1];
-// 			throw std::invalid_argument(msg);
-// 		}
-// 		_args.push(av[i]);
-// 		i -= 2;
-// 		ac--;
-// 	}
-// }
-
-/*************************************************************
-*		    👁️‍ GETTERS and SETTERS				 			*
-*************************************************************/

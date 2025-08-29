@@ -2,9 +2,13 @@
 #define RPN_H
 
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <stack>
 #include <cstring>
+#include "util.hpp"
+
+typedef int (*opf)(int, int);
 
 class RPN {
 	public:

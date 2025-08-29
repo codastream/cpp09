@@ -37,5 +37,6 @@
 void	printnl(const std::string &s);
 void	printcol(const std::string& col, const std::string& msg);
 void	puterr();
+void	puterr(const std::string& msg);
 
 #endif
